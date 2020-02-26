@@ -63,7 +63,6 @@ public class Scripts {
      * @return
      */
     public Object load(Script parent, String name) {
-        Log.d("JsDroid", "load:" + name);
         if (name.endsWith(".groovy")) {
             try {
                 Script script = createGroovyScriptFromSource(name);

@@ -121,19 +121,19 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("弹出toast")
     public void toast(Object text) {
-        Apps defaultApp = Apps.getRunnerApp();
-        if (defaultApp != null) {
-            defaultApp.toast(text);
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
+            runnerApp.toast(text);
         }
     }
 
     @MethodDoc("输入文字")
     public void inputText(
             @FieldName("文字") String text) {
-        Apps defaultApp = Apps.getRunnerApp();
-        if (defaultApp != null) {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
             try {
-                IInput input = defaultApp.getInput();
+                IInput input = runnerApp.getInput();
                 input.input(text);
             } catch (InterruptedException e) {
             }
@@ -142,10 +142,10 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("清除文字")
     public void clearInput(@FieldName("光标前位数") int before, @FieldName("光标后位数") int after) {
-        Apps defaultApp = Apps.getRunnerApp();
-        if (defaultApp != null) {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
             try {
-                IInput input = defaultApp.getInput();
+                IInput input = runnerApp.getInput();
                 input.clear(before, after);
             } catch (InterruptedException e) {
             }
@@ -154,10 +154,10 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("输入go")
     public void inputGo() {
-        Apps defaultApp = Apps.getRunnerApp();
-        if (defaultApp != null) {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
             try {
-                IInput input = defaultApp.getInput();
+                IInput input = runnerApp.getInput();
                 input.inputGo();
             } catch (InterruptedException e) {
             }
@@ -166,10 +166,10 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("输入结束")
     public void inputDone() {
-        Apps defaultApp = Apps.getRunnerApp();
-        if (defaultApp != null) {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
             try {
-                IInput input = defaultApp.getInput();
+                IInput input = runnerApp.getInput();
                 input.inputDone();
             } catch (InterruptedException e) {
             }
@@ -178,10 +178,10 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("输入下一步")
     public void inputNext() {
-        Apps defaultApp = Apps.getRunnerApp();
-        if (defaultApp != null) {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
             try {
-                IInput input = defaultApp.getInput();
+                IInput input = runnerApp.getInput();
                 input.inputNext();
             } catch (InterruptedException e) {
             }
@@ -190,10 +190,10 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("输入搜索动作")
     public void inputSearch() {
-        Apps defaultApp = Apps.getRunnerApp();
-        if (defaultApp != null) {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
             try {
-                IInput input = defaultApp.getInput();
+                IInput input = runnerApp.getInput();
                 input.inputSearch();
             } catch (InterruptedException e) {
             }
@@ -202,10 +202,10 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("输入发送动作")
     public void inputSend() {
-        Apps defaultApp = Apps.getRunnerApp();
-        if (defaultApp != null) {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
             try {
-                IInput input = defaultApp.getInput();
+                IInput input = runnerApp.getInput();
                 input.inputSend();
             } catch (InterruptedException e) {
             }
@@ -214,10 +214,10 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("输入未指定的动作")
     public void inputUnspecified() {
-        Apps defaultApp = Apps.getRunnerApp();
-        if (defaultApp != null) {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
             try {
-                IInput input = defaultApp.getInput();
+                IInput input = runnerApp.getInput();
                 input.inputUnspecified();
             } catch (InterruptedException e) {
             }

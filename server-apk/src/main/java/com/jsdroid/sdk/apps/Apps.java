@@ -24,6 +24,10 @@ public class Apps {
         return runnerApp;
     }
 
+    public static Apps getDefaultApp() {
+        return getInstance("com.jsdroid.app");
+    }
+
     public synchronized static void putApp(String pkg, IJsDroidApp app) {
         Apps apps = new Apps(pkg, app);
         String app_pkg = System.getenv("app_pkg");
@@ -42,18 +46,18 @@ public class Apps {
     }
 
     public static void loadScript(String file) throws InterruptedException {
-        Apps runnerApp = getRunnerApp();
-        if (runnerApp != null && "com.jsdroid.test".equals(runnerApp.pkg)) {
+        Apps defaultApp = getDefaultApp();
+        if (defaultApp != null) {
             new File(file).setExecutable(true, false);
             new File(file).setReadable(true, false);
             new File(file).setWritable(true, false);
-            runnerApp.app.loadScript(file);
+            defaultApp.app.loadScript(file);
         }
     }
 
     public String readConfig(String key, String defaultValue) {
         if ("jsd.exe".equals(key)) {
-            Apps defaultApp = Apps.getInstance("com.jsdroid.test");
+            Apps defaultApp = getDefaultApp();
             if (defaultApp == null) {
                 return defaultValue;
             }
@@ -91,9 +95,9 @@ public class Apps {
         } catch (Exception e) {
         }
         if ("jsd.exe".equals(pkg)) {
-            Apps runnerApp = getRunnerApp();
-            if (runnerApp != null) {
-                runnerApp.doPrint(text);
+            Apps defaultApp = getDefaultApp();
+            if (defaultApp != null) {
+                defaultApp.doPrint(text);
             }
         }
     }
