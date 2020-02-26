@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 class PermissionUtil {
 
     static boolean hasPermission(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (SdkVersion.SDK_INT >= Build.VERSION_CODES.M) {
             return Settings.canDrawOverlays(context);
         } else {
             return hasPermissionBelowMarshmallow(context);
@@ -29,10 +29,10 @@ class PermissionUtil {
     }
 
     static boolean hasPermissionOnActivityResult(Context context) {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+        if (SdkVersion.SDK_INT == Build.VERSION_CODES.O) {
             return hasPermissionForO(context);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (SdkVersion.SDK_INT >= Build.VERSION_CODES.M) {
             return Settings.canDrawOverlays(context);
         } else {
             return hasPermissionBelowMarshmallow(context);
@@ -68,7 +68,7 @@ class PermissionUtil {
             if (mgr == null) return false;
             View viewToAdd = new View(context);
             WindowManager.LayoutParams params = new WindowManager.LayoutParams(0, 0,
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
+                    SdkVersion.SDK_INT >= Build.VERSION_CODES.O ?
                             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSPARENT);

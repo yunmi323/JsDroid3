@@ -33,6 +33,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.qmuiteam.qmui.widget.QMUIViewPager;
 import com.qmuiteam.qmui.widget.tab.QMUITabSegment;
+import com.yhao.floatwindow.SdkVersion;
 
 public class MainActivity extends AppCompatActivity implements UiMessageUtils.UiMessageCallback {
 
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
         setContentView(R.layout.activity_main);
         initView();
         setSupportActionBar(toolBar);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (SdkVersion.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toolBar.setElevation(10);
         }
         accountHeader = new AccountHeaderBuilder()

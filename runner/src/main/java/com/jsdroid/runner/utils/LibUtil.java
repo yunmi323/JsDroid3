@@ -3,6 +3,8 @@ package com.jsdroid.runner.utils;
 import android.os.Build;
 import android.util.Log;
 
+import com.jsdroid.runner.JsDroidAppEnv;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 
 public class LibUtil {
 
@@ -97,7 +100,7 @@ public class LibUtil {
         } catch (Throwable ignore) {
         }
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (JsDroidAppEnv.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 for (String supportedAbi : Build.SUPPORTED_ABIS) {
                     if (supportedAbi != null) {
                         if (!ret.contains(supportedAbi)) {

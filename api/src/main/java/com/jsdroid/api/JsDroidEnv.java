@@ -8,4 +8,6 @@ public class JsDroidEnv {
     public static String classesDir = "/data/local/tmp/jsd_classes";
     public static String pluginDir = "/data/local/tmp/jsd_plugin";
     public static String serverClass = "com.jsdroid.server.JsDroidServer";
+
+
 }

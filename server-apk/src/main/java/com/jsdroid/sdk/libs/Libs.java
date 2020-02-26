@@ -92,7 +92,7 @@ public class Libs {
         } catch (Throwable ignore) {
         }
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 for (String supportedAbi : Build.SUPPORTED_ABIS) {
                     if (supportedAbi != null) {
                         if (!ret.contains(supportedAbi)) {
@@ -106,4 +106,7 @@ public class Libs {
         }
         return ret;
     }
+
+    public static final int SDK_INT = Build.VERSION.SDK_INT
+            + ("REL".equals(Build.VERSION.CODENAME) ? 0 : 1);
 }

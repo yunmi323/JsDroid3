@@ -27,7 +27,7 @@ public class FloatActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (SdkVersion.SDK_INT >= Build.VERSION_CODES.M) {
             requestAlertWindowPermission();
         }
     }

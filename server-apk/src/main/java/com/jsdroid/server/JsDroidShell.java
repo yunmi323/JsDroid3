@@ -16,6 +16,7 @@ import com.jsdroid.sdk.events.Event;
 import com.jsdroid.sdk.events.EventListener;
 import com.jsdroid.sdk.events.Events;
 import com.jsdroid.sdk.inputs.Inputs;
+import com.jsdroid.sdk.libs.Libs;
 import com.jsdroid.sdk.nodes.Node;
 import com.jsdroid.sdk.nodes.Nodes;
 import com.jsdroid.sdk.screens.Screens;
@@ -348,7 +349,7 @@ public class JsDroidShell implements IJsDroidShell {
         deviceInfo.model = Build.MODEL;
         deviceInfo.screenWidth = getScreenWidth();
         deviceInfo.screenHeight = getScreenHeight();
-        deviceInfo.sdk = Build.VERSION.SDK_INT;
+        deviceInfo.sdk = Libs.SDK_INT;
         try {
             deviceInfo.uuid = getUUID();
         } catch (IOException e) {

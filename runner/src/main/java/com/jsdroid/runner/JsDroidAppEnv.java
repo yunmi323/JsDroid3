@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class JsDroidAppEnv {
+    public static final int SDK_INT = Build.VERSION.SDK_INT
+            + ("REL".equals(Build.VERSION.CODENAME) ? 0 : 1);
+
     private static class Single {
         static JsDroidAppEnv single = new JsDroidAppEnv();
     }
@@ -85,7 +88,9 @@ public class JsDroidAppEnv {
     }
 
     private InputStream getSdkAssetsStream(Context context) throws IOException {
-        String file = "sdk" + Build.VERSION.SDK_INT + ".apk";
+        //如果是发行版，则sdk = SDK_INT+1
+
+        String file = "sdk" + SDK_INT + ".apk";
         try {
             String[] list = context.getAssets().list("");
             if (Arrays.asList(list).contains(file)) {

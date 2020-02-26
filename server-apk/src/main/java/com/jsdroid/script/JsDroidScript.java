@@ -18,6 +18,7 @@ import com.jsdroid.sdk.events.Events;
 import com.jsdroid.sdk.files.Files;
 import com.jsdroid.sdk.gestures.Gestures;
 import com.jsdroid.sdk.https.Https;
+import com.jsdroid.sdk.libs.Libs;
 import com.jsdroid.sdk.logs.Logs;
 import com.jsdroid.sdk.nodes.Node;
 import com.jsdroid.sdk.nodes.Nodes;
@@ -505,7 +506,7 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("安卓版本号")
     public int getSdk() {
-        return Build.VERSION.SDK_INT;
+        return Libs.SDK_INT;
     }
 
     @MethodDoc("读取配置")

@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.jsdroid.api.annotations.Doc;
 import com.jsdroid.test.JsdApp;
+import com.yhao.floatwindow.SdkVersion;
 
 import java.io.File;
 
@@ -47,7 +48,7 @@ public class ScriptInfoView extends LinearLayout {
     }
 
     public static Context getFixedContext(Context context) {
-        if (Build.VERSION.SDK_INT >= 21 && Build.VERSION.SDK_INT < 23) // Android Lollipop 5.0 & 5.1
+        if (SdkVersion.SDK_INT >= 21 && SdkVersion.SDK_INT < 23) // Android Lollipop 5.0 & 5.1
             return context.createConfigurationContext(new Configuration());
         return context;
     }

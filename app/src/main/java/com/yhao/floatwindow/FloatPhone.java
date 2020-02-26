@@ -55,10 +55,10 @@ class FloatPhone extends FloatView {
 
     @Override
     public void init() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+        if (SdkVersion.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             req();
         } else if (Miui.rom()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (SdkVersion.SDK_INT >= Build.VERSION_CODES.M) {
                 req();
             } else {
                 mLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
@@ -92,7 +92,7 @@ class FloatPhone extends FloatView {
     }
 
     private void req() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (SdkVersion.SDK_INT >= Build.VERSION_CODES.O) {
             mLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
             mLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
