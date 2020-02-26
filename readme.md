@@ -76,6 +76,21 @@ jsd create helloworld
   |-- icon.png 项目图标，建议1024x1024格式图片
 ```
 
+#### 界面配置
+option.json
+```
+{
+    "key1":{
+        "name":"配置1",
+        "value":"默认值1"
+    },
+    "key2":{
+        "name":"配置2",
+        "value":"默认值2"
+    }
+}
+```
+
 #### 编译项目
 ```
 d:
@@ -187,11 +202,11 @@ if(nodes){
 inputText "JsDroid"
 ```
 
-- clearText 清除文字
+- clearInput 清除文字
 
 ```groovy
 //清除光标前后各1000文字
-clearText 1000,1000
+clearInput 1000,1000
 ```
 
 - findPic 找图
