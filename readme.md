@@ -84,7 +84,7 @@ option.json
         "name":"配置1",
         "value":"默认值1"
     },
-    "key1":{
+    "key2":{
         "name":"配置2",
         "value":"默认值2"
     }
