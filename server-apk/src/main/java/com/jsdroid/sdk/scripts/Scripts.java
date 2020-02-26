@@ -2,17 +2,17 @@ package com.jsdroid.sdk.scripts;
 
 import android.util.Log;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.jsdroid.api.IJsDroidApp;
 import com.jsdroid.api.JsDroidEnv;
 import com.jsdroid.groovy.AndroidGroovyScriptLoader;
+import com.jsdroid.script.JsDroidScript;
 import com.jsdroid.sdk.libs.Libs;
 import com.jsdroid.sdk.zips.ZipInput;
-import com.jsdroid.script.JsDroidScript;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -168,17 +168,20 @@ public class Scripts {
     }
 
 
-    public ScriptInfo getScriptInfo(DexClassLoader classLoader) throws IOException {
+    public ScriptInfo getScriptInfo(DexClassLoader classLoader) throws Exception {
         try (InputStream input = classLoader.getResourceAsStream("config.json")) {
             ScriptInfo scriptInfo = new ScriptInfo();
             String body = IOUtils.toString(input, "utf-8");
-            JSONObject json = JSON.parseObject(body);
-            scriptInfo.setVersion(json.getString("version"));
-            scriptInfo.setVersion(json.getString("pkg"));
-            scriptInfo.setName(json.getString("name"));
-            scriptInfo.setMainScript(json.getString("mainScript"));
-            Log.d("JsDroid", "getScriptInfo: " + scriptInfo.getMainScript());
-            return scriptInfo;
+            try {
+                JSONObject json = new JSONObject(body);
+                scriptInfo.setVersion(json.getString("version"));
+                scriptInfo.setVersion(json.getString("pkg"));
+                scriptInfo.setName(json.getString("name"));
+                scriptInfo.setMainScript(json.getString("mainScript"));
+                return scriptInfo;
+            } catch (Exception e) {
+                throw new Exception("无法解析config.json,config.json内容：" + body, e);
+            }
         }
     }
 }
