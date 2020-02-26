@@ -80,14 +80,7 @@ class FloatPhone extends FloatView {
                 });
             }
         } else {
-            try {
-                mLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
-                mWindowManager.addView(mView, mLayoutParams);
-            } catch (Exception e) {
-                mWindowManager.removeView(mView);
-                LogUtil.e("TYPE_TOAST 失败");
-                req();
-            }
+            req();
         }
     }
 
