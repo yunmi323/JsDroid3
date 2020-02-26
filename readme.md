@@ -76,6 +76,21 @@ jsd create helloworld
   |-- icon.png 项目图标，建议1024x1024格式图片
 ```
 
+#### 界面配置
+option.json
+```
+{
+    "key1":{
+        "name":"配置1",
+        "value":"默认值1"
+    },
+    "key1":{
+        "name":"配置1",
+        "value":"默认值1"
+    }
+}
+```
+
 #### 编译项目
 ```
 d:
