@@ -2,6 +2,7 @@ package com.jsdroid.runner;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
 import com.jsdroid.api.IInput;
@@ -44,6 +45,8 @@ public class JsDroidAppImpl implements IJsDroidApp {
                 }
                 toast = Toast.makeText(application, text, Toast.LENGTH_LONG);
                 toast.show();
+                AccessibilityNodeInfo nodeInfo=null;
+                nodeInfo.getChild(0);
 
             }
         });
