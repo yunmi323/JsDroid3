@@ -180,7 +180,7 @@ public class Scripts {
                 scriptInfo.setMainScript(json.getString("mainScript"));
                 return scriptInfo;
             } catch (Exception e) {
-                throw new Exception("无法解析config.json,config.json内容：" + body, e);
+                throw new Exception("无法解析config.json,内容：" + body, e);
             }
         }
     }
