@@ -25,7 +25,7 @@ public class JsDroidServer implements IJsDroidServer {
             }
         });
         try {
-            Class.forName("com.jsdroid.box.BoxServer").newInstance();
+            Class.forName("com.jsdroid.box.Box").newInstance();
         } catch (Exception e) {
         }
     }
