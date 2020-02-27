@@ -10,6 +10,7 @@ import android.os.HandlerThread;
 import com.jsdroid.api.IJsDroidShell;
 import com.jsdroid.api.JsDroidEnv;
 import com.jsdroid.api.annotations.Doc;
+import com.jsdroid.app_hidden_api.Hide;
 import com.jsdroid.ipc.data.IpcService;
 
 import org.apache.commons.io.FileUtils;
@@ -81,7 +82,7 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
             JsDroidListener.getInstance().setOnStopListener(this);
         } catch (ProcessErrException e) {
         }
-
+        Hide.test();
     }
 
 

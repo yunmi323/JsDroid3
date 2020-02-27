@@ -3,6 +3,7 @@ package com.jsdroid.test;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ThreadUtils;
@@ -35,6 +36,7 @@ public class JsdApp extends JsDroidApplication {
             }, 3000);
 
         }
+
     }
 
     @Override
