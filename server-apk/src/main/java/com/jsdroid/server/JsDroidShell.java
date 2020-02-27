@@ -223,13 +223,14 @@ public class JsDroidShell implements IJsDroidShell {
 
 
     private boolean runScript(final String file, boolean isSource) throws InterruptedException {
-        if ("jsd.exe".equals(pkg)) {
-            Apps.loadScript(file);
-        }
+
         execute(new Runnable() {
             @Override
             public void run() {
                 try {
+                    if ("jsd.exe".equals(pkg)) {
+                        Apps.loadScript(file);
+                    }
                     Scripts.getInstance(pkg).setApp(app);
                     Script script;
                     if (isSource) {
