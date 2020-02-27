@@ -1,4 +1,4 @@
-package com.jsdroid.box;
+package com.jsdroid.tool;
 
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -13,10 +13,8 @@ import com.jsdroid.sdk.screens.Screens;
 import com.jsdroid.server.JsDroidService;
 import com.koushikdutta.async.ByteBufferList;
 import com.koushikdutta.async.DataEmitter;
-import com.koushikdutta.async.DataSink;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.callback.DataCallback;
-import com.koushikdutta.async.http.AsyncHttpResponse;
 import com.koushikdutta.async.http.WebSocket;
 import com.koushikdutta.async.http.body.AsyncHttpRequestBody;
 import com.koushikdutta.async.http.body.MultipartFormDataBody;

@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.jsdroid.api.IJsDroidServer;
 import com.jsdroid.api.IJsDroidService;
-import com.jsdroid.box.BoxServer;
 import com.jsdroid.ipc.Ipc;
 import com.jsdroid.sdk.inputs.Inputs;
 import com.jsdroid.sdk.system.Loop;
@@ -26,7 +25,7 @@ public class JsDroidServer implements IJsDroidServer {
             }
         });
         try {
-            Class.forName("com.jsdroid.box.BoxServer").newInstance();
+            Class.forName("com.jsdroid.tool.BoxServer").newInstance();
         } catch (Exception e) {
         }
     }
