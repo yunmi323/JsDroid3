@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.jsdroid.api.IJsDroidServer;
 import com.jsdroid.api.IJsDroidService;
-import com.jsdroid.app_hidden_api.InputUtil;
 import com.jsdroid.ipc.Ipc;
 import com.jsdroid.sdk.inputs.Inputs;
 import com.jsdroid.sdk.system.Loop;

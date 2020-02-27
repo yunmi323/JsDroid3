@@ -276,13 +276,11 @@ public class JsDroidShell implements IJsDroidShell {
             @Override
             public void run() {
                 try {
-
                     if (out == null) {
                         app.onScriptStop(null);
                     } else {
                         app.onScriptStop(out.toString());
                     }
-
                 } catch (Exception ex) {
                 }
                 try {

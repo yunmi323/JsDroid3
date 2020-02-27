@@ -6,12 +6,9 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManagerInternal;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.os.Build;
-import android.view.KeyEvent;
 
 import com.jsdroid.api.IInput;
 import com.jsdroid.api.IJsDroidApp;
@@ -32,7 +29,6 @@ import com.jsdroid.sdk.logs.Logs;
 import com.jsdroid.sdk.nodes.Node;
 import com.jsdroid.sdk.nodes.Nodes;
 import com.jsdroid.sdk.nodes.Store;
-import com.jsdroid.sdk.nodes.UiAutomationConnector;
 import com.jsdroid.sdk.points.Points;
 import com.jsdroid.sdk.rects.Rects;
 import com.jsdroid.sdk.screens.Screens;
@@ -72,66 +68,66 @@ public abstract class JsDroidScript extends Script {
         return Scripts.getInstance(pkg).load(this, name);
     }
 
-    public Files getJFile() {
+    public Files getGFile() {
         return files;
     }
 
-    public Logs getJLog() {
+    public Logs getGLog() {
         return Logs.getInstance();
     }
 
-    public Https getJHttp() {
+    public Https getGHttp() {
         return Https.getInstance();
     }
 
-    public Sockets getJSocket() {
+    public Sockets getGSocket() {
         return Sockets.getInstance();
     }
 
-    public Devices getJDevice() {
+    public Devices getGDevice() {
         return Devices.getInstance();
     }
 
-    public Directions getJDirection() {
+    public Directions getGDirection() {
         return Directions.getInstance();
     }
 
-    public Events getJEvent() {
+    public Events getGEvent() {
         return Events.getInstance();
     }
 
-    public Gestures getJGesture() {
+    public Gestures getGGesture() {
         return Gestures.getInstance();
     }
 
-    public Nodes getJNode() {
+    public Nodes getGNode() {
         return Nodes.getInstance();
     }
 
-    public Points getJPoint() {
+    public Points getGPoint() {
         return Points.getInstance();
     }
 
-    public Rects getJRect() {
+    public Rects getGRect() {
         return Rects.getInstance();
     }
 
-    public Screens getJScreen() {
+    public Screens getGScreen() {
         return Screens.getInstance();
     }
 
-    public Shells getJShell() {
+    public Shells getGShell() {
         return Shells.getInstance();
     }
 
-    public Apps getJApp() {
+    public Apps getGApp() {
         return Apps.getInstance(pkg);
     }
 
     public void setApp(String pkg, IJsDroidApp app) {
         this.pkg = pkg;
         this.app = app;
-        setProperty("out", getJApp());
+        setProperty("out", getGApp());
     }
 
     @MethodDoc("弹出toast")
@@ -241,50 +237,50 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("手指按下")
     public void touchDown(@FieldName("x") int x, @FieldName("y") int y) {
-        getJEvent().touchDown(x, y);
+        getGEvent().touchDown(x, y);
     }
 
     @MethodDoc("手指弹起")
     public void touchUp(int x, int y) {
-        getJEvent().touchUp(x, y);
+        getGEvent().touchUp(x, y);
     }
 
     @MethodDoc("手指移动")
     public void touchMove(@FieldName("x") int x, @FieldName("y") int y) {
-        getJEvent().touchMove(x, y);
+        getGEvent().touchMove(x, y);
     }
 
     @MethodDoc("点击屏幕")
     public void click(@FieldName("x") int x, @FieldName("y") int y) {
-        getJEvent().tap(x, y);
+        getGEvent().tap(x, y);
     }
 
     @MethodDoc("点击屏幕")
     public void tap(@FieldName("x") int x, @FieldName("y") int y) {
-        getJEvent().tap(x, y);
+        getGEvent().tap(x, y);
     }
 
     @MethodDoc("手指滑动")
     public void swipe(@FieldName("x1") int x1, @FieldName("y1") int y1, @FieldName("x2") int x2,
                       @FieldName("y2") int y2) {
-        getJEvent().swipe(x1, y1, x2, y2, 20);
+        getGEvent().swipe(x1, y1, x2, y2, 20);
     }
 
     @MethodDoc("手指滑动")
     public void swipe(@FieldName("x1") int x1, @FieldName("y1") int y1, @FieldName("x2") int x2,
                       @FieldName("y2") int y2, @FieldName("补间数量") int steps) {
-        getJEvent().swipe(x1, y1, x2, y2, steps);
+        getGEvent().swipe(x1, y1, x2, y2, steps);
     }
 
     @MethodDoc("模拟按键")
     public void keyPress(@FieldName("按键码") int code) {
-        getJEvent().pressKeyCode(code);
+        getGEvent().pressKeyCode(code);
     }
 
     @MethodDoc("查找单个节点")
     public Node findNode(@FieldName("正则表达式") Pattern pattern) {
         final Store<Node> nodeStore = new Store<>();
-        getJNode().eachNode(new Node.NodeEach() {
+        getGNode().eachNode(new Node.NodeEach() {
             @Override
             public boolean each(Node node) {
                 try {
@@ -318,7 +314,7 @@ public abstract class JsDroidScript extends Script {
     @MethodDoc("查找所有节点")
     public List<Node> findNodeAll(@FieldName("正则表达式") Pattern pattern) {
         final List<Node> nodes = new ArrayList<>();
-        getJNode().eachNode(new Node.NodeEach() {
+        getGNode().eachNode(new Node.NodeEach() {
             @Override
             public boolean each(Node node) {
                 try {
@@ -358,7 +354,7 @@ public abstract class JsDroidScript extends Script {
                                 @FieldName("相似度") float sim) {
         Bitmap image;
         try {
-            image = BitmapFactory.decodeStream(getJFile().openRes(pngFile));
+            image = BitmapFactory.decodeStream(getGFile().openRes(pngFile));
         } catch (Exception e) {
             return null;
         }
@@ -381,7 +377,7 @@ public abstract class JsDroidScript extends Script {
                                 @FieldName("相似度") float sim) {
         Bitmap screen;
         try {
-            screen = getJScreen().capture();
+            screen = getGScreen().capture();
         } catch (InterruptedException e) {
             return null;
         }
@@ -436,7 +432,7 @@ public abstract class JsDroidScript extends Script {
                          @FieldName("相似度") float sim) {
         Bitmap image;
         try {
-            image = BitmapFactory.decodeStream(getJFile().openRes(pngFile));
+            image = BitmapFactory.decodeStream(getGFile().openRes(pngFile));
         } catch (Exception e) {
             return null;
         }
@@ -459,7 +455,7 @@ public abstract class JsDroidScript extends Script {
                          @FieldName("相似度") float sim) {
         Bitmap screen;
         try {
-            screen = getJScreen().capture();
+            screen = getGScreen().capture();
         } catch (InterruptedException e) {
             return null;
         }
@@ -531,7 +527,7 @@ public abstract class JsDroidScript extends Script {
     @MethodDoc("读取配置")
     public String readConfig(@FieldName("key") String key,
                              @FieldName("默认值") String defaultValue) {
-        return getJApp().readConfig(key, defaultValue);
+        return getGApp().readConfig(key, defaultValue);
     }
 
     @MethodDoc("读取配置")
@@ -572,33 +568,33 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("发送http请求")
     public String httpGet(@FieldName("链接") String url) {
-        return getJHttp().get(url);
+        return getGHttp().get(url);
     }
 
     @MethodDoc("发送http请求")
     public String httpGet(@FieldName("链接") String url,
                           @FieldName("数据") Map params) {
-        return getJHttp().get(url, params);
+        return getGHttp().get(url, params);
     }
 
     @MethodDoc("发送http请求")
     public String httpGet(@FieldName("链接") String url,
                           @FieldName("请求头") Map headers,
                           @FieldName("数据") Map params) {
-        return getJHttp().get(url, headers, params);
+        return getGHttp().get(url, headers, params);
     }
 
     @MethodDoc("发送http请求")
     public String httpPost(@FieldName("链接") String url,
                            @FieldName("数据") Map params) {
-        return getJHttp().post(url, params);
+        return getGHttp().post(url, params);
     }
 
     @MethodDoc("发送http请求")
     public String httpPost(@FieldName("链接") String url,
                            @FieldName("请求头") Map headers,
                            @FieldName("数据") Map params) {
-        return getJHttp().post(url, headers, params);
+        return getGHttp().post(url, headers, params);
     }
 
     @MethodDoc("杀死app进程")
