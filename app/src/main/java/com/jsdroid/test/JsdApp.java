@@ -6,9 +6,11 @@ import android.util.Log;
 import android.view.WindowManager;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.UiMessageUtils;
 import com.blankj.utilcode.util.ZipUtils;
+import com.jsdroid.runner.JsDroidAppImpl;
 import com.jsdroid.runner.JsDroidApplication;
 
 import java.io.File;
@@ -49,7 +51,9 @@ public class JsdApp extends JsDroidApplication {
     @Override
     public void onJsDroidConnected() {
         super.onJsDroidConnected();
+
         UiMessageUtils.getInstance().send(UiMessage.JSDROID_CONNECT);
+        UiMessageUtils.getInstance().send(UiMessage.PRINT, "服务连接.");
     }
 
     @Override
@@ -80,13 +84,19 @@ public class JsdApp extends JsDroidApplication {
     }
 
     @Override
+    public void onWaitAdbPort() {
+        super.onWaitAdbPort();
+        UiMessageUtils.getInstance().send(UiMessage.PRINT, "等待免root服务.");
+    }
+
+    @Override
     public void onScriptPrint(String text) {
         super.onScriptPrint(text);
         UiMessageUtils.getInstance().send(UiMessage.PRINT, text);
     }
 
     private void readFloatWindowState() {
-        showFloatView = Boolean.parseBoolean(readConfig("jsd_float_menu", "true"));
+        showFloatView = Boolean.parseBoolean(readConfig("jsd_float_menu", "false"));
     }
 
     private void readVolumeControlState() {
@@ -125,6 +135,7 @@ public class JsdApp extends JsDroidApplication {
         ThreadUtils.executeByCached(new ThreadUtils.Task<Object>() {
             @Override
             public Object doInBackground() throws Throwable {
+                FileUtils.deleteAllInDir(getScriptDir());
                 ZipUtils.unzipFile(new File(file), getScriptDir());
                 return null;
             }
@@ -142,7 +153,7 @@ public class JsdApp extends JsDroidApplication {
 
             @Override
             public void onFail(Throwable t) {
-
+                Log.e("JsDroid", "onFail: ", t);
             }
         });
     }

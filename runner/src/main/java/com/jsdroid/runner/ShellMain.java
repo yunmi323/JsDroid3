@@ -48,8 +48,8 @@ public class ShellMain {
                 notifyDaemonLoop();
                 try {
                     LibUtil.extractLibFile(JsDroidEnv.sdkFile, JsDroidEnv.libDir);
-                    LibUtil.extractLibFile(JsDroidEnv.shellApkFile, JsDroidEnv.libDir);
-                    DexClassLoader shellClassLoader = getDexClassLoader(JsDroidEnv.sdkFile + ":" + JsDroidEnv.shellApkFile);
+                    LibUtil.extractLibFile(JsDroidEnv.shellServerFile, JsDroidEnv.libDir);
+                    DexClassLoader shellClassLoader = getDexClassLoader(JsDroidEnv.sdkFile + ":" + JsDroidEnv.shellServerFile);
                     Class<?> aClass = shellClassLoader.loadClass(
                             JsDroidEnv.serverClass);
                     IJsDroidServer jsDroidServer = (IJsDroidServer) aClass.newInstance();

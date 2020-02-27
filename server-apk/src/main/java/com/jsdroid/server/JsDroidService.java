@@ -42,8 +42,9 @@ public class JsDroidService implements IJsDroidService {
 
     }
 
+
     @Override
-    public void onAddService(String serviceId, ServiceProxy serviceProxy) {
-        //在这里初始化系统服务
+    public boolean needGc() {
+        return false;
     }
 }

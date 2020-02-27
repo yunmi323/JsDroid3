@@ -1,20 +1,19 @@
 package com.jsdroid.ipc.call;
 
 import com.jsdroid.ipc.annotations.Timeout;
-import com.jsdroid.ipc.data.IpcService;
 import com.jsdroid.ipc.data.DataInput;
 import com.jsdroid.ipc.data.DataOutput;
 import com.jsdroid.ipc.data.Input;
+import com.jsdroid.ipc.data.IpcService;
 import com.jsdroid.ipc.data.IpcServiceManager;
 import com.jsdroid.ipc.data.Output;
-import com.jsdroid.ipc.service.IHeart;
 import com.jsdroid.ipc.service.ISocket;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 
 
@@ -28,8 +27,8 @@ public class ServiceProxy {
     //远程调用的socket
     private ISocket socket;
     //回调缓存
-    private Map<Long, Object> resultMap;
-    private Object resultLock;
+    private WeakHashMap<Long, Object> resultMap;
+    private final Object resultLock;
     private ExecutorService threadPool;
     private Input input;
     private Output output;
@@ -38,27 +37,8 @@ public class ServiceProxy {
         this.serviceManager = new IpcServiceManager();
         this.threadPool = threadPool;
         this.socket = socket;
-        this.resultMap = new HashMap<>();
+        this.resultMap = new WeakHashMap<>();
         this.resultLock = new Object();
-        addService("heart", new IHeart() {
-            @Override
-            public void onAddService(String serviceId, ServiceProxy serviceProxy) {
-
-            }
-
-
-            @Timeout(1000)
-            @Override
-            public boolean heart() {
-                return true;
-            }
-
-            @Timeout(3000)
-            @Override
-            public boolean heart3000() {
-                return true;
-            }
-        });
     }
 
     public void prepare() {

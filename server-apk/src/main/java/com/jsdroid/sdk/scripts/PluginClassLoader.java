@@ -2,12 +2,17 @@ package com.jsdroid.sdk.scripts;
 
 import com.jsdroid.api.JsDroidEnv;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import dalvik.system.DexClassLoader;
 
 public class PluginClassLoader extends ClassLoader {
+
     static class PluginDexClassLoader extends BaseClassLoader {
         public PluginDexClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
             super(dexPath, optimizedDirectory, librarySearchPath, parent);
@@ -34,11 +39,12 @@ public class PluginClassLoader extends ClassLoader {
 
     private Map<String, PluginDexClassLoader> classLoaderMap = new HashMap<>();
 
-    public void add(String file) {
+    public void add(String file) throws IOException {
         if (classLoaderMap.containsKey(file)) {
             return;
         }
-        PluginDexClassLoader dexClassLoader = new PluginDexClassLoader(file, JsDroidEnv.optDir, JsDroidEnv.libDir, PluginClassLoader.class.getClassLoader());
+        PluginDexClassLoader dexClassLoader = new PluginDexClassLoader(file,
+                JsDroidEnv.optDir, JsDroidEnv.libDir, PluginClassLoader.class.getClassLoader());
         classLoaderMap.put(file, dexClassLoader);
     }
 

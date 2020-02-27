@@ -18,6 +18,9 @@ import groovy.lang.Script;
  * 调用Groovy中的GroovyClassloader得到class文件，通过google的dx工具将class文件转换为dex文件，然后通过DexClassLoader将dex文件加载进来即可。
  */
 public class AndroidGroovyScriptLoader {
+
+    public static final String PREFIX = "jsd-groovy-script-";
+
     private String dexOptDir;
     private String dexTmpDir;
     private String scriptBaseClass;
@@ -52,8 +55,9 @@ public class AndroidGroovyScriptLoader {
 
     }
 
+
     private Script createScript(ClassLoader parentClassLoader, DexBytecodeProcessor bytecodeProcessor) throws IOException {
-        File tmpDex = new File(dexTmpDir, UUID.randomUUID() + ".dex");
+        File tmpDex = new File(dexTmpDir, PREFIX + UUID.randomUUID() + ".dex");
         try (FileOutputStream out = new FileOutputStream(tmpDex)) {
             bytecodeProcessor.writeDexToFile(out);
         }

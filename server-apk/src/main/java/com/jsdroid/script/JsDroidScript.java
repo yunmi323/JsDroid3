@@ -1,9 +1,17 @@
 package com.jsdroid.script;
 
+import android.app.ActivityThread;
+import android.app.Application;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManagerInternal;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Build;
+import android.view.KeyEvent;
 
 import com.jsdroid.api.IInput;
 import com.jsdroid.api.IJsDroidApp;
@@ -11,6 +19,7 @@ import com.jsdroid.api.annotations.FieldName;
 import com.jsdroid.api.annotations.MethodDoc;
 import com.jsdroid.findimg.FindImg;
 import com.jsdroid.findpic.FindPic;
+import com.jsdroid.ipc.call.SyncRunnable;
 import com.jsdroid.sdk.apps.Apps;
 import com.jsdroid.sdk.devices.Devices;
 import com.jsdroid.sdk.directions.Directions;
@@ -23,6 +32,7 @@ import com.jsdroid.sdk.logs.Logs;
 import com.jsdroid.sdk.nodes.Node;
 import com.jsdroid.sdk.nodes.Nodes;
 import com.jsdroid.sdk.nodes.Store;
+import com.jsdroid.sdk.nodes.UiAutomationConnector;
 import com.jsdroid.sdk.points.Points;
 import com.jsdroid.sdk.rects.Rects;
 import com.jsdroid.sdk.screens.Screens;
@@ -32,11 +42,15 @@ import com.jsdroid.sdk.sockets.Sockets;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import groovy.lang.Binding;
+import groovy.lang.Closure;
 import groovy.lang.Script;
 
 public abstract class JsDroidScript extends Script {
@@ -260,6 +274,11 @@ public abstract class JsDroidScript extends Script {
     public void swipe(@FieldName("x1") int x1, @FieldName("y1") int y1, @FieldName("x2") int x2,
                       @FieldName("y2") int y2, @FieldName("补间数量") int steps) {
         getJEvent().swipe(x1, y1, x2, y2, steps);
+    }
+
+    @MethodDoc("模拟按键")
+    public void keyPress(@FieldName("按键码") int code) {
+        getJEvent().pressKeyCode(code);
     }
 
     @MethodDoc("查找单个节点")
@@ -519,4 +538,106 @@ public abstract class JsDroidScript extends Script {
     public String readConfig(@FieldName("key") String key) {
         return readConfig(key, null);
     }
+
+    @MethodDoc("执行shell命令")
+    public String exec(@FieldName("shell命令") String shell) {
+        return Shells.getInstance().exec(shell);
+    }
+
+    @MethodDoc("并发执行,等待结束")
+    public void multiThread(@FieldName("闭包") Closure... closures) {
+        List<SyncRunnable> syncRunnableList = new ArrayList<>();
+        for (Closure closure : closures) {
+            SyncRunnable runnable = new SyncRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    closure.call();
+                }
+            });
+            syncRunnableList.add(runnable);
+            new Thread(runnable).start();
+        }
+        for (SyncRunnable runnable : syncRunnableList) {
+            try {
+                runnable.sync();
+            } catch (Throwable throwable) {
+                StringWriter sw = new StringWriter();
+                try (PrintWriter pw = new PrintWriter(sw)) {
+                    throwable.printStackTrace(pw);
+                }
+                print(sw.toString());
+            }
+        }
+    }
+
+    @MethodDoc("发送http请求")
+    public String httpGet(@FieldName("链接") String url) {
+        return getJHttp().get(url);
+    }
+
+    @MethodDoc("发送http请求")
+    public String httpGet(@FieldName("链接") String url,
+                          @FieldName("数据") Map params) {
+        return getJHttp().get(url, params);
+    }
+
+    @MethodDoc("发送http请求")
+    public String httpGet(@FieldName("链接") String url,
+                          @FieldName("请求头") Map headers,
+                          @FieldName("数据") Map params) {
+        return getJHttp().get(url, headers, params);
+    }
+
+    @MethodDoc("发送http请求")
+    public String httpPost(@FieldName("链接") String url,
+                           @FieldName("数据") Map params) {
+        return getJHttp().post(url, params);
+    }
+
+    @MethodDoc("发送http请求")
+    public String httpPost(@FieldName("链接") String url,
+                           @FieldName("请求头") Map headers,
+                           @FieldName("数据") Map params) {
+        return getJHttp().post(url, headers, params);
+    }
+
+    @MethodDoc("杀死app进程")
+    public void killApp(@FieldName("包名") String pkg) {
+        exec("am force-stop " + pkg);
+    }
+
+    @MethodDoc("启动app")
+    public void runApp(@FieldName("包名或者应用名") String pkgOrName) {
+        String appPkg = getAppPkg(pkgOrName);
+        if (appPkg != null) {
+            Application application = ActivityThread.currentApplication();
+            PackageManager pm = application.getPackageManager();
+            Intent intent = pm.getLaunchIntentForPackage(appPkg);
+            if (intent != null) {
+                ComponentName component = intent.getComponent();
+                if (component != null) {
+                    String am = component.flattenToShortString();
+                    exec("am start -n " + am);
+                }
+            }
+        }
+
+    }
+
+    private String getAppPkg(String pkgOrName) {
+        Application application = ActivityThread.currentApplication();
+        PackageManager pm = application.getPackageManager();
+        List<PackageInfo> packages = pm.getInstalledPackages(0);
+        for (PackageInfo aPackage : packages) {
+            if (aPackage.packageName.equals(pkgOrName)) {
+                return pkgOrName;
+            }
+            CharSequence name = pm.getApplicationLabel(aPackage.applicationInfo);
+            if (pkgOrName.equals(name.toString())) {
+                return aPackage.packageName;
+            }
+        }
+        return null;
+    }
+
 }

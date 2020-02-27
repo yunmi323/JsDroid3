@@ -4,12 +4,11 @@ if [ -z $abi64 ]; then
     exit 1
 fi
 rm -rf /data/local/tmp/*
-cp $server_apk /data/local/tmp/jsd_server.apk
-cp $sdk_apk /data/local/tmp/sdk.apk
+# cp $server_apk /data/local/tmp/jsd_server.apk
+# cp $sdk_apk /data/local/tmp/sdk.apk
 mkdir /data/local/tmp/jsd_opt
 mkdir /data/local/tmp/jsd_lib
 mkdir /data/local/tmp/jsd_classes
-mkdir /data/local/tmp/jsd_classes_lib
 jsdroid=/data/local/tmp/jsd_server
 
 # some os cannot execute $path directly

@@ -6,12 +6,13 @@ import com.jsdroid.api.IJsDroidApp;
 import com.jsdroid.api.JsDroidEnv;
 import com.jsdroid.groovy.AndroidGroovyScriptLoader;
 import com.jsdroid.script.JsDroidScript;
+import com.jsdroid.sdk.files.Files;
 import com.jsdroid.sdk.libs.Libs;
+import com.jsdroid.sdk.zips.FileEach;
 import com.jsdroid.sdk.zips.ZipInput;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -138,25 +139,31 @@ public class Scripts {
     }
 
     public Script createGroovyScriptFromJsd(String file) throws Exception {
-        //将里面的plugin解压出来
-        new ZipInput(file).unzipFileToDir("plugin", JsDroidEnv.pluginDir);
-        File pluginDir = new File(JsDroidEnv.pluginDir, "plugin");
-        File[] pluginFiles = pluginDir.listFiles();
-        if (pluginFiles != null) {
-            for (File pluginFile : pluginFiles) {
-                if (pluginFile.isFile()) {
-                    if (pluginFile.getName().endsWith(".apk")) {
-                        try {
-                            Libs.extractLibFile(pluginFile.getPath(), JsDroidEnv.libDir);
-                        } catch (Exception e) {
+        //如果脚本文件更新，则将里面的plugin解压出来
+        if (Files.isFileUpdate(new File(file))) {
+            new ZipInput(file).unzipFileToDir("plugin", JsDroidEnv.pluginDir);
+            File pluginDir = new File(JsDroidEnv.pluginDir, "plugin");
+            File[] pluginFiles = pluginDir.listFiles();
+            if (pluginFiles != null) {
+                for (File pluginFile : pluginFiles) {
+                    if (pluginFile.isFile()) {
+                        if (pluginFile.getName().endsWith(".apk")) {
+                            try {
+                                Libs.extractLibFile(pluginFile.getPath(), JsDroidEnv.libDir);
+                            } catch (Exception e) {
+                            }
+                            try {
+                                PluginClassLoader.getInstance().add(pluginFile.getPath());
+                            } catch (IOException e) {
+                            }
                         }
-                        PluginClassLoader.getInstance().add(pluginFile.getPath());
-                    }
 
+                    }
                 }
             }
         }
-        File apk = new File("/data/local/tmp/" + UUID.randomUUID() + ".apk");
+
+        File apk = new File("/data/local/tmp/" + getCachePrefix() + UUID.randomUUID() + ".apk");
         FileUtils.copyFile(new File(file), apk);
         ScriptClassLoader classLoader = new ScriptClassLoader(apk.getPath(), JsDroidEnv.optDir, JsDroidEnv.libDir);
         ScriptInfo scriptInfo = getScriptInfo(classLoader);
@@ -167,6 +174,26 @@ public class Scripts {
 
     }
 
+    private String getCachePrefix() {
+        return pkg + ".cache.";
+    }
+
+    public void deleteScriptCacheFile() {
+        final String preName = getCachePrefix();
+        FileEach.eachFile(new File("/data/local/tmp/"), new FileEach() {
+            @Override
+            public boolean each(File file, int depth) {
+                String name = file.getName();
+                if (name.startsWith(preName)
+                        || name.startsWith(AndroidGroovyScriptLoader.PREFIX)) {
+                    if (name.endsWith(".dex") || name.endsWith(".apk") || name.endsWith(".odex") || name.endsWith(".vdex")) {
+                        file.delete();
+                    }
+                }
+                return false;
+            }
+        });
+    }
 
     public ScriptInfo getScriptInfo(DexClassLoader classLoader) throws Exception {
         try (InputStream input = classLoader.getResourceAsStream("config.json")) {

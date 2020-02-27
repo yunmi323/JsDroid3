@@ -79,6 +79,7 @@ dependencies {
     implementation 'com.koushikdutta.async:androidasync:2.+'
     implementation "com.alibaba:fastjson:$FAST_JSON_VERSION"
     implementation project(":app-hidden-api")
+    implementation "commons-codec:commons-codec:1.14"
 
 }
 build.doLast {

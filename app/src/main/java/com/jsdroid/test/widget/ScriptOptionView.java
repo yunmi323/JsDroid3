@@ -3,24 +3,24 @@ package com.jsdroid.test.widget;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.UiMessageUtils;
 import com.jsdroid.api.annotations.Doc;
 import com.jsdroid.test.JsdApp;
-import com.jsdroid.test.MainActivity;
 import com.jsdroid.test.R;
 import com.jsdroid.test.UiMessage;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 @Doc("脚本配置界面")
 public class ScriptOptionView extends LinearLayout {
@@ -43,15 +43,24 @@ public class ScriptOptionView extends LinearLayout {
         File scriptDir = jsd.getScriptDir();
         File optionFile = new File(scriptDir, "option.json");
         try {
-            JSONObject jsonObject = JSON.parseObject(FileUtils.readFileToString(optionFile));
-            for (String key : jsonObject.keySet()) {
-                //添加
-                JSONObject optionItem = jsonObject.getJSONObject(key);
-                String name = optionItem.getString("name");
-                String value = optionItem.getString("value");
+            String optionContent = FileUtils.readFileToString(optionFile);
+            JSONObject json = new JSONObject(optionContent);
+            Iterator<String> keys = json.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                JSONObject optionItem = json.getJSONObject(key);
+                String name = null;
+                if (optionItem.has("name")) {
+                    name = optionItem.getString("name");
+                }
+                String value = null;
+                if (optionItem.has("value")) {
+                    value = optionItem.getString("value");
+                }
                 addOption(key, name, value);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
+            Log.e("JsDroid", "loadOptions: ", e);
         }
     }
 

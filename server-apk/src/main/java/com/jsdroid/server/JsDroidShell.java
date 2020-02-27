@@ -2,6 +2,7 @@ package com.jsdroid.server;
 
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.jsdroid.api.IJsDroidApp;
@@ -21,6 +22,7 @@ import com.jsdroid.sdk.nodes.Node;
 import com.jsdroid.sdk.nodes.Nodes;
 import com.jsdroid.sdk.screens.Screens;
 import com.jsdroid.sdk.scripts.Scripts;
+import com.jsdroid.sdk.shells.Shells;
 import com.jsdroid.sdk.threads.SingleThread;
 
 import org.apache.commons.io.FileUtils;
@@ -46,6 +48,11 @@ public class JsDroidShell implements IJsDroidShell {
     @Override
     public void onAddService(String serviceId, ServiceProxy serviceProxy) {
         this.serviceProxy = serviceProxy;
+    }
+
+    @Override
+    public boolean needGc() {
+        return false;
     }
 
     public void execute(Runnable runnable) {
@@ -216,8 +223,9 @@ public class JsDroidShell implements IJsDroidShell {
 
 
     private boolean runScript(final String file, boolean isSource) throws InterruptedException {
-        System.gc();
-        Apps.loadScript(file);
+        if ("jsd.exe".equals(pkg)) {
+            Apps.loadScript(file);
+        }
         execute(new Runnable() {
             @Override
             public void run() {
@@ -243,6 +251,8 @@ public class JsDroidShell implements IJsDroidShell {
                     }
                 } finally {
                     setRunning(false);
+                    //运行结束，清除脚本数据
+                    Scripts.getInstance(pkg).deleteScriptCacheFile();
                 }
             }
         });
@@ -298,7 +308,11 @@ public class JsDroidShell implements IJsDroidShell {
                     if (running) {
                         app.onScriptStop(null);
                     }
-                    Thread.sleep(200);
+                } catch (Exception e) {
+                }
+                try {
+                    //清除缓存数据
+                    Scripts.getInstance(pkg).deleteScriptCacheFile();
                 } catch (Exception e) {
                 }
                 System.exit(0);
@@ -372,37 +386,46 @@ public class JsDroidShell implements IJsDroidShell {
 
     @Override
     public void input(String text) throws InterruptedException {
-
+        try {
+            app.getInput().input(text);
+        } catch (Exception e) {
+        }
     }
 
     @Override
     public void clear(int before, int after) throws InterruptedException {
-
+        try {
+            app.getInput().clear(before, after);
+        } catch (Exception e) {
+        }
     }
 
     @Override
     public void pressKeyCode(int keyCode) throws InterruptedException {
-
+        Events.getInstance().pressKeyCode(keyCode);
     }
 
     @Override
     public void pressBack() throws InterruptedException {
-
+        Events.getInstance().pressBack();
     }
 
     @Override
     public void pressHome() throws InterruptedException {
-
+        Events.getInstance().pressHome();
     }
 
     @Override
     public void pressRecent() throws InterruptedException {
-
+        Events.getInstance().toggleRecentApps();
     }
 
     @Override
     public void wakeUp() throws InterruptedException {
-
+        try {
+            Devices.getInstance().wakeDevice();
+        } catch (RemoteException e) {
+        }
     }
 
     @Override
@@ -432,17 +455,17 @@ public class JsDroidShell implements IJsDroidShell {
 
     @Override
     public String exec(String shell) throws InterruptedException {
-        return null;
+        return Shells.getInstance().exec(shell);
     }
 
     @Override
     public void openInputMethod() throws InterruptedException {
-
+        Inputs.getInstance().openInputMethod();
     }
 
     @Override
     public void closeInputMethod() throws InterruptedException {
-
+        Inputs.getInstance().closeInputMethod();
     }
 
     @Override
@@ -452,6 +475,6 @@ public class JsDroidShell implements IJsDroidShell {
 
     @Override
     public boolean isRunning() {
-        return false;
+        return running;
     }
 }

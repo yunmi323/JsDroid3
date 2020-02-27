@@ -2,6 +2,7 @@ package com.jsdroid.sdk.files;
 
 import com.jsdroid.script.JsDroidScript;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -100,5 +101,24 @@ public class Files {
         } catch (IOException e) {
         }
         return false;
+    }
+
+    public static boolean isFileUpdate(File file) throws IOException {
+        String md5 = md5(file);
+        File md5File = new File(file.getPath() + ".md5");
+        if (md5File.exists()) {
+            String old = FileUtils.readFileToString(md5File);
+            if (old.equals(md5)) {
+                return false;
+            }
+        }
+        FileUtils.writeStringToFile(md5File, md5);
+        return true;
+    }
+
+    private static String md5(File file) throws IOException {
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            return DigestUtils.md5Hex(inputStream);
+        }
     }
 }

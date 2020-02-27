@@ -2,6 +2,7 @@ package com.jsdroid.ipc.call;
 
 public class SyncRunnable implements Runnable {
     private final Runnable mTarget;
+    private Throwable err;
     private boolean mComplete;
 
     public SyncRunnable(Runnable target) {
@@ -9,14 +10,18 @@ public class SyncRunnable implements Runnable {
     }
 
     public void run() {
-        mTarget.run();
+        try {
+            mTarget.run();
+        } catch (Throwable e) {
+            this.err = e;
+        }
         synchronized (this) {
             mComplete = true;
             notifyAll();
         }
     }
 
-    public void sync() {
+    public void sync() throws Throwable {
         synchronized (this) {
             while (!mComplete) {
                 try {
@@ -25,7 +30,11 @@ public class SyncRunnable implements Runnable {
                 }
             }
         }
+        if (err != null) {
+            throw err;
+        }
     }
+
     public void sync(int time) {
         synchronized (this) {
             if (!mComplete) {

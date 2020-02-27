@@ -45,8 +45,6 @@ public class JsDroidAppImpl implements IJsDroidApp {
                 }
                 toast = Toast.makeText(application, text, Toast.LENGTH_LONG);
                 toast.show();
-                AccessibilityNodeInfo nodeInfo=null;
-                nodeInfo.getChild(0);
 
             }
         });
@@ -108,6 +106,11 @@ public class JsDroidAppImpl implements IJsDroidApp {
                 serviceProxy.addService(key, serviceMap.get(key));
             }
         }
+    }
+
+    @Override
+    public boolean needGc() {
+        return false;
     }
 
     public void setApplication(JsDroidApplication application) {

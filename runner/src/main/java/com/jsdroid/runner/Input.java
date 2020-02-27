@@ -58,7 +58,7 @@ public class Input extends InputMethodService implements IInput {
 
 
     @Override
-    public void onAddService(String serviceId, ServiceProxy serviceProxy) {
-
+    public boolean needGc() {
+        return false;
     }
 }

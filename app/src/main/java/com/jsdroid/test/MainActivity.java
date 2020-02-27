@@ -1,7 +1,11 @@
 package com.jsdroid.test;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 
@@ -31,6 +35,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.QMUIViewPager;
 import com.qmuiteam.qmui.widget.tab.QMUITabSegment;
 import com.yhao.floatwindow.SdkVersion;
@@ -54,8 +59,13 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
         setContentView(R.layout.activity_main);
         initView();
         setSupportActionBar(toolBar);
+        Drawable overflowIcon = toolBar.getOverflowIcon();
+        if (overflowIcon != null) {
+            overflowIcon.setColorFilter(0xffffffff,
+                    PorterDuff.Mode.SRC_IN);
+        }
         if (SdkVersion.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            toolBar.setElevation(10);
+            toolBar.setElevation(QMUIDisplayHelper.dp2px(this, 10));
         }
         accountHeader = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -107,6 +117,18 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
         tabPage.setAdapter(tabAdapter);
         tabSegment.setupWithViewPager(tabPage);
         tabPage.setSwipeable(true);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add("运行").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                FloatLogo.getInstance().show();
+                return false;
+            }
+        }).setIcon(R.drawable.ic_play).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return super.onCreateOptionsMenu(menu);
     }
 
     private void initView() {

@@ -6,11 +6,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 
 import com.jsdroid.api.IJsDroidShell;
-import com.jsdroid.api.JsDroidEnv;
 import com.jsdroid.api.annotations.Doc;
-import com.jsdroid.app_hidden_api.Hide;
 import com.jsdroid.ipc.data.IpcService;
 
 import org.apache.commons.io.FileUtils;
@@ -82,7 +81,6 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
             JsDroidListener.getInstance().setOnStopListener(this);
         } catch (ProcessErrException e) {
         }
-        Hide.test();
     }
 
 
@@ -236,6 +234,7 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
                         jsDroidShell.runScript(scriptFile);
                     } catch (Exception e) {
                         e.printStackTrace();
+                        Log.e("JsDroid", "run: ", e);
                     }
                 }
             }
@@ -275,6 +274,7 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
         }
         return false;
     }
+
     public void toggleScript() {
         singleHandler.post(new Runnable() {
             @Override
@@ -289,4 +289,10 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
         });
     }
 
+    public void exec(String shell) {
+        try {
+            getJsDroidShell().exec(shell);
+        } catch (InterruptedException e) {
+        }
+    }
 }
