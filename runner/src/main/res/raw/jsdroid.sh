@@ -3,7 +3,7 @@ if [ -z $abi64 ]; then
     echo "ERROR: please open JsDroid to make a new jsdroid.sh" >&2
     exit 1
 fi
-rm -rf /data/local/tmp/*
+rm -rf /data/local/tmp/jsd_server
 # cp $server_apk /data/local/tmp/jsd_server.apk
 # cp $sdk_apk /data/local/tmp/sdk.apk
 mkdir /data/local/tmp/jsd_opt
