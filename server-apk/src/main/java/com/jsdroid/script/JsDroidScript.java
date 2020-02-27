@@ -620,7 +620,8 @@ public abstract class JsDroidScript extends Script {
 
     }
 
-    private String getAppPkg(String pkgOrName) {
+    @MethodDoc("获取app包名")
+    public String getAppPkg(@FieldName("包名或者应用名") String pkgOrName) {
         Application application = ActivityThread.currentApplication();
         PackageManager pm = application.getPackageManager();
         List<PackageInfo> packages = pm.getInstalledPackages(0);
