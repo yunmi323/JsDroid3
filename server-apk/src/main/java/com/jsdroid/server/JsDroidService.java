@@ -10,8 +10,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JsDroidService implements IJsDroidService {
+    private static class Single {
+        private static JsDroidService service = new JsDroidService();
+    }
+
+    public static JsDroidService getInstance() {
+        return Single.service;
+    }
 
     private Map<String, JsDroidShell> appMap = new HashMap<>();
+    private ServiceProxy serviceProxy;
+
+    private JsDroidService() {
+    }
+
+    @Override
+    public void onAddService(String serviceId, ServiceProxy serviceProxy) {
+        this.serviceProxy = serviceProxy;
+    }
 
     @Override
     public IJsDroidShell getShell(IJsDroidApp app) throws InterruptedException {
@@ -21,6 +37,7 @@ public class JsDroidService implements IJsDroidService {
             if (appMap.containsKey(pkg)) {
                 JsDroidShell jsDroidShell = appMap.get(pkg);
                 jsDroidShell.setApp(app);
+                jsDroidShell.setServiceProxy(serviceProxy);
                 return jsDroidShell;
             } else {
                 JsDroidShell jsDroidShell = createJsDroidShell(app);

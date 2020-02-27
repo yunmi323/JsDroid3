@@ -2,7 +2,10 @@ package com.jsdroid.sdk.logs;
 
 import android.util.Log;
 
+import java.io.File;
+
 public class Logs {
+
     private static class Single {
         public static Logs https = new Logs();
     }
@@ -30,4 +33,6 @@ public class Logs {
     public void e(String content, Throwable err) {
         Log.e("JsDroid", content, err);
     }
+
+
 }

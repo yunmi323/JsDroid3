@@ -55,8 +55,16 @@ public class JsDroidShell implements IJsDroidShell {
         return false;
     }
 
-    public void execute(Runnable runnable) {
+    public boolean execute(Runnable runnable) {
+        if (serviceProxy == null) {
+            return false;
+        }
         serviceProxy.execute(runnable);
+        return true;
+    }
+
+    public void setServiceProxy(ServiceProxy serviceProxy) {
+        this.serviceProxy = serviceProxy;
     }
 
     public JsDroidShell(JsDroidService service, IJsDroidApp app) throws InterruptedException {
@@ -178,20 +186,23 @@ public class JsDroidShell implements IJsDroidShell {
     }
 
     public boolean runScript(String file) throws InterruptedException {
+        if (file == null) {
+            return false;
+        }
+        if (serviceProxy == null) {
+            return false;
+        }
         synchronized (JsDroidShell.this) {
             if (running) {
                 return false;
             }
-            setRunning(true);
         }
-        if (file == null) {
-            return false;
-        }
+        setRunning(true);
         if (file.endsWith(".groovy")) {
-            return runScript(file, true);
+            return (runScript(file, true));
         }
         if (file.endsWith(".jsd")) {
-            return runScript(file, false);
+            return (runScript(file, false));
         }
         return false;
     }
@@ -224,7 +235,7 @@ public class JsDroidShell implements IJsDroidShell {
 
     private boolean runScript(final String file, boolean isSource) throws InterruptedException {
 
-        execute(new Runnable() {
+        return execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -257,7 +268,6 @@ public class JsDroidShell implements IJsDroidShell {
                 }
             }
         });
-        return true;
     }
 
     private void setRunning(boolean running) {
