@@ -11,6 +11,7 @@ public class BoxLog {
 
     public static void print(String text) {
         if (text == null) {
+
             return;
         }
         try (FileOutputStream out = new FileOutputStream(getLogFile(), true)) {
