@@ -185,6 +185,10 @@ public class BoxServer {
         }
     }
 
+    public BoxServer() {
+        this(9809);
+    }
+
     public BoxServer(final int port) {
         AsyncHttpServer httpServer = new AsyncHttpServer();
         httpServer.post("/api/runScript", new HttpServerRequestCallback() {
