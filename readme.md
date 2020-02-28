@@ -202,11 +202,11 @@ if(nodes){
 inputText "JsDroid"
 ```
 
-- clearInput 清除文字
+- clearText 清除文字
 
 ```groovy
 //清除光标前后各1000文字
-clearInput 1000,1000
+clearText 1000,1000
 ```
 
 - findPic 找图
