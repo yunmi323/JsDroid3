@@ -1,8 +1,8 @@
 package com.jsdroid.sdk.files;
 
+import com.jsdroid.codec.digest.DigestUtils;
 import com.jsdroid.script.JsDroidScript;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 

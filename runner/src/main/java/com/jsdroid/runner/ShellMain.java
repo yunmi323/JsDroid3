@@ -49,7 +49,7 @@ public class ShellMain {
                 try {
                     LibUtil.extractLibFile(JsDroidEnv.sdkFile, JsDroidEnv.libDir);
                     LibUtil.extractLibFile(JsDroidEnv.shellServerFile, JsDroidEnv.libDir);
-                    DexClassLoader shellClassLoader = getDexClassLoader(JsDroidEnv.sdkFile + ":" + JsDroidEnv.shellServerFile);
+                    ClassLoader shellClassLoader = getClassLoader(JsDroidEnv.sdkFile + ":" + JsDroidEnv.shellServerFile);
                     Class<?> aClass = shellClassLoader.loadClass(
                             JsDroidEnv.serverClass);
                     IJsDroidServer jsDroidServer = (IJsDroidServer) aClass.newInstance();
@@ -74,21 +74,22 @@ public class ShellMain {
 
     }
 
-    private static DexClassLoader getDexClassLoader(String file) throws IOException {
-        return getDexClassLoader(null, file);
+    private static ClassLoader getClassLoader(String file) throws IOException {
+        return getClassLoader(null, file);
     }
 
-    private static DexClassLoader getDexClassLoader(ClassLoader parent, String file) throws IOException {
+    private static ClassLoader getClassLoader(ClassLoader parent, String file) throws IOException {
         if (parent == null) {
             parent = JsDroidApplication.class.getClassLoader();
         }
         //1.将apk文件里面的so解压出来
-
         //2.加载com.jsdroid.server.JsDroidServer
-        return new DexClassLoader(
+       return new DexClassLoader(
                 file,
                 JsDroidEnv.optDir,
                 JsDroidEnv.libDir,
                 parent);
+
+
     }
 }
