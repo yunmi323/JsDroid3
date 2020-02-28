@@ -110,8 +110,9 @@ public class Https {
     }
 
     public boolean download(String url, String savePath) {
-        Connection connect = connect(url, Connection.Method.POST);
+        Connection connect = connect(url, Connection.Method.GET);
         connect.maxBodySize(Integer.MAX_VALUE);
+        connect.followRedirects(true);
         try (BufferedInputStream inputStream = connect.execute().bodyStream();
              FileOutputStream outputStream = new FileOutputStream(savePath);
         ) {
