@@ -66,6 +66,7 @@ public class JsdApp extends JsDroidApplication {
     public void onScriptStop(String result) {
         super.onScriptStop(result);
         if (result != null) {
+            UiMessageUtils.getInstance().send(UiMessage.PRINT, result);
             UiMessageUtils.getInstance().send(UiMessage.SRIPT_STOP, result);
         } else {
             UiMessageUtils.getInstance().send(UiMessage.SRIPT_STOP);

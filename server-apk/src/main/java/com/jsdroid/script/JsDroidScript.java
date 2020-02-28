@@ -152,7 +152,7 @@ public abstract class JsDroidScript extends Script {
     }
 
     @MethodDoc("清除文字")
-    public void clearInput(@FieldName("光标前位数") int before, @FieldName("光标后位数") int after) {
+    public void clearText(@FieldName("光标前位数") int before, @FieldName("光标后位数") int after) {
         Apps runnerApp = Apps.getRunnerApp();
         if (runnerApp != null) {
             try {
