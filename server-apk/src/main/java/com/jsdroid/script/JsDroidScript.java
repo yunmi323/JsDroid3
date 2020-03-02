@@ -1,7 +1,9 @@
 package com.jsdroid.script;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.ActivityThread;
 import android.app.Application;
+import android.app.UiAutomation;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -29,6 +31,8 @@ import com.jsdroid.sdk.logs.Logs;
 import com.jsdroid.sdk.nodes.Node;
 import com.jsdroid.sdk.nodes.Nodes;
 import com.jsdroid.sdk.nodes.Store;
+import com.jsdroid.sdk.nodes.UiAutomationConnector;
+import com.jsdroid.sdk.nodes.UiAutomationService;
 import com.jsdroid.sdk.points.Points;
 import com.jsdroid.sdk.rects.Rects;
 import com.jsdroid.sdk.screens.Screens;
@@ -40,6 +44,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +58,76 @@ public abstract class JsDroidScript extends Script {
     private IJsDroidApp app;
     private String pkg;
     private Files files;
+
+    static {
+        setFetchNotImportantNodeEnable(true);
+        setFetchWebNodeEnable(true);
+    }
+
+    @MethodDoc("获取UiAutomation,不知者不推荐使用")
+    public static UiAutomation getUiAutomation() {
+        try {
+            Field uiAutomationField = UiAutomationService.class.getDeclaredField("uiAutomation");
+            uiAutomationField.setAccessible(true);
+            return (UiAutomation) uiAutomationField.get(UiAutomationService.getInstance());
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    @MethodDoc("设置是否获取不重要节点")
+    public static void setFetchNotImportantNodeEnable(boolean enable) {
+        if (enable) {
+            addNodeFlag(AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS);
+        } else {
+            removeNodeFlag(AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS);
+        }
+    }
+
+
+    @MethodDoc("设置是否开启web增强模式")
+    public static void setFetchWebNodeEnable(boolean enable) {
+        if (enable) {
+            addNodeFlag(AccessibilityServiceInfo.FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY);
+        } else {
+            removeNodeFlag(AccessibilityServiceInfo.FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY);
+        }
+    }
+
+    /**
+     * @param flag
+     * @see AccessibilityServiceInfo#FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+     * @see AccessibilityServiceInfo#FLAG_REQUEST_TOUCH_EXPLORATION_MODE
+     * @see AccessibilityServiceInfo#FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY
+     * @see AccessibilityServiceInfo#FLAG_REQUEST_FILTER_KEY_EVENTS
+     * @see AccessibilityServiceInfo#FLAG_REPORT_VIEW_IDS
+     * @see AccessibilityServiceInfo#FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+     * @see AccessibilityServiceInfo#FLAG_ENABLE_ACCESSIBILITY_VOLUME
+     * @see AccessibilityServiceInfo#FLAG_REQUEST_ACCESSIBILITY_BUTTON
+     */
+    @MethodDoc("添加节点标志")
+    public static void addNodeFlag(int flag) {
+        try {
+            UiAutomation uiAutomation = getUiAutomation();
+            assert uiAutomation != null;
+            AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
+            serviceInfo.flags |= flag;
+            uiAutomation.setServiceInfo(serviceInfo);
+        } catch (Throwable e) {
+        }
+    }
+
+    @MethodDoc("删除节点标志")
+    public static void removeNodeFlag(int flag) {
+        try {
+            UiAutomation uiAutomation = getUiAutomation();
+            assert uiAutomation != null;
+            AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
+            serviceInfo.flags &= ~flag;
+            uiAutomation.setServiceInfo(serviceInfo);
+        } catch (Throwable e) {
+        }
+    }
 
     public JsDroidScript() {
         files = new Files(this);
@@ -636,5 +711,6 @@ public abstract class JsDroidScript extends Script {
         }
         return null;
     }
+
 
 }
