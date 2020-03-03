@@ -295,7 +295,6 @@ public class JsDroidShell implements IJsDroidShell {
                 }
                 try {
                     if ("jsd.exe".equals(pkg)) {
-                        Log.d("JsDroid", "stop jsd.exe: ");
                         if (out == null) {
                             Apps.getRunnerApp().getApp().onScriptStop(null);
                         } else {

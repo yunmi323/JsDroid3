@@ -2,6 +2,7 @@ package com.jsdroid.runner;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 

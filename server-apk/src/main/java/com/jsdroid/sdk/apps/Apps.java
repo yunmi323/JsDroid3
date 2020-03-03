@@ -1,5 +1,7 @@
 package com.jsdroid.sdk.apps;
 
+import android.util.Log;
+
 import com.jsdroid.api.IInput;
 import com.jsdroid.api.IJsDroidApp;
 
@@ -56,7 +58,7 @@ public class Apps {
     }
 
     public String readConfig(String key, String defaultValue) {
-        if ("jsd.exe".equals(key)) {
+        if ("jsd.exe".equals(pkg)) {
             Apps defaultApp = getDefaultApp();
             if (defaultApp == null) {
                 return defaultValue;
