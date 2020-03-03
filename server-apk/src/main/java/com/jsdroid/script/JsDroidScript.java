@@ -712,5 +712,19 @@ public abstract class JsDroidScript extends Script {
         return null;
     }
 
+    @MethodDoc("设置屏幕亮度,设置范围0-255")
+    public void setScreenBrightness(int brightness) {
+        exec("settings put system screen_brightness_mode 0\n" +
+                "settings put system screen_brightness " + brightness + "\n");
+    }
 
+    @MethodDoc("读取屏幕亮度，如果读取失败，则返回-1")
+    public int getScreenBrightness() {
+        try {
+            String str = exec("settings get system screen_brightness");
+            return Integer.parseInt(str);
+        } catch (Exception e) {
+        }
+        return -1;
+    }
 }
