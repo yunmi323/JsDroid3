@@ -785,7 +785,7 @@ public abstract class JsDroidScript extends Script {
     }
 
     @MethodDoc("检查jsd输入法是否打开")
-    public boolean checkInput() {
+    public boolean checkJsdInput() {
         Apps runnerApp = Apps.getRunnerApp();
         if (runnerApp != null) {
             try {
