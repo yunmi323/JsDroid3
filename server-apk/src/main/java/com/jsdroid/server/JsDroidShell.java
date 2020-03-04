@@ -163,6 +163,7 @@ public class JsDroidShell implements IJsDroidShell {
             @Override
             public void run() {
                 Inputs.getInstance().onScriptStart(pkg);
+
                 try {
                     if ("jsd.exe".equals(pkg)) {
                         Apps.getRunnerApp().getApp().onScriptStart();
@@ -171,6 +172,7 @@ public class JsDroidShell implements IJsDroidShell {
                     }
                 } catch (InterruptedException e) {
                 }
+
             }
         });
 
@@ -207,6 +209,13 @@ public class JsDroidShell implements IJsDroidShell {
         return false;
     }
 
+    /**
+     * 运行代码，发送结果，可并非执行
+     *
+     * @param code
+     * @return
+     * @throws InterruptedException
+     */
     @Override
     public boolean runCode(String code) throws InterruptedException {
         execute(new Runnable() {
@@ -224,8 +233,6 @@ public class JsDroidShell implements IJsDroidShell {
                         sendScriptStop(out);
                     } catch (Exception ex) {
                     }
-                } finally {
-                    setRunning(false);
                 }
             }
         });

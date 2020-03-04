@@ -38,6 +38,7 @@ public class Inputs {
             openInputMethod();
         }
         stack.push(pkg);
+
     }
 
     public synchronized void onScriptStop(String pkg) {

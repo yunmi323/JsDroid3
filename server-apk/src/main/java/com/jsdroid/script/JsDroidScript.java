@@ -225,7 +225,7 @@ public abstract class JsDroidScript extends Script {
             try {
                 IInput input = runnerApp.getInput();
                 input.input(text);
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
             }
         }
     }
@@ -237,7 +237,7 @@ public abstract class JsDroidScript extends Script {
             try {
                 IInput input = runnerApp.getInput();
                 input.clear(before, after);
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
             }
         }
     }
@@ -249,7 +249,7 @@ public abstract class JsDroidScript extends Script {
             try {
                 IInput input = runnerApp.getInput();
                 input.inputGo();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
             }
         }
     }
@@ -261,7 +261,7 @@ public abstract class JsDroidScript extends Script {
             try {
                 IInput input = runnerApp.getInput();
                 input.inputDone();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
             }
         }
     }
@@ -273,7 +273,7 @@ public abstract class JsDroidScript extends Script {
             try {
                 IInput input = runnerApp.getInput();
                 input.inputNext();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
             }
         }
     }
@@ -285,7 +285,7 @@ public abstract class JsDroidScript extends Script {
             try {
                 IInput input = runnerApp.getInput();
                 input.inputSearch();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
             }
         }
     }
@@ -297,7 +297,7 @@ public abstract class JsDroidScript extends Script {
             try {
                 IInput input = runnerApp.getInput();
                 input.inputSend();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
             }
         }
     }
@@ -309,7 +309,7 @@ public abstract class JsDroidScript extends Script {
             try {
                 IInput input = runnerApp.getInput();
                 input.inputUnspecified();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
             }
         }
     }
@@ -457,7 +457,7 @@ public abstract class JsDroidScript extends Script {
         Bitmap screen;
         try {
             screen = getGScreen().capture();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             return null;
         }
         return findImg(screen,
@@ -535,7 +535,7 @@ public abstract class JsDroidScript extends Script {
         Bitmap screen;
         try {
             screen = getGScreen().capture();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             return null;
         }
         return findPic(screen,
@@ -782,5 +782,18 @@ public abstract class JsDroidScript extends Script {
     @MethodDoc("获取adb序列号")
     public String getSerial() {
         return getProp("ro.serialno");
+    }
+
+    @MethodDoc("检查jsd输入法是否打开")
+    public boolean checkInput() {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
+            try {
+                IInput input = runnerApp.getInput();
+                return input != null;
+            } catch (Exception e) {
+            }
+        }
+        return false;
     }
 }
