@@ -5,13 +5,18 @@ import android.app.ActivityThread;
 import android.app.Application;
 import android.app.UiAutomation;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.os.IBinder;
+import android.telephony.TelephonyManager;
 
+import com.genymobile.scrcpy.wrappers.ServiceManager;
+import com.genymobile.scrcpy.wrappers.SurfaceControl;
 import com.jsdroid.api.IInput;
 import com.jsdroid.api.IJsDroidApp;
 import com.jsdroid.api.annotations.FieldName;
@@ -31,7 +36,6 @@ import com.jsdroid.sdk.logs.Logs;
 import com.jsdroid.sdk.nodes.Node;
 import com.jsdroid.sdk.nodes.Nodes;
 import com.jsdroid.sdk.nodes.Store;
-import com.jsdroid.sdk.nodes.UiAutomationConnector;
 import com.jsdroid.sdk.nodes.UiAutomationService;
 import com.jsdroid.sdk.points.Points;
 import com.jsdroid.sdk.rects.Rects;
@@ -726,5 +730,57 @@ public abstract class JsDroidScript extends Script {
         } catch (Exception e) {
         }
         return -1;
+    }
+
+    //息屏运行模式
+    @MethodDoc("屏幕显示模式(0:息屏 2:普通)")
+    public void setScreenPowerMode(int mode) {
+        IBinder d = SurfaceControl.getBuiltInDisplay();
+        if (d == null) {
+            return;
+        }
+        SurfaceControl.setDisplayPowerMode(d, mode);
+    }
+
+    private ServiceManager serviceManager = new ServiceManager();
+
+    @MethodDoc("设置剪切板")
+    public void setClipboardText(String text) {
+        serviceManager.getClipboardManager().setText(text);
+    }
+
+    @MethodDoc("读取剪切板")
+    public String getClipboardText() {
+        try {
+            return serviceManager.getClipboardManager().getText().toString();
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    @MethodDoc("读取prop")
+    public String getProp(String key) {
+        try {
+            return exec("getprop " + key);
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    @MethodDoc("获取imei")
+    public String getIMEI() {
+        try {
+            ActivityThread activityThread = ActivityThread.currentActivityThread();
+            Application application = activityThread.getApplication();
+            TelephonyManager tm = (TelephonyManager) application.getSystemService(Context.TELEPHONY_SERVICE);
+            return tm.getDeviceId();
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    @MethodDoc("获取adb序列号")
+    public String getSerial() {
+        return getProp("ro.serialno");
     }
 }

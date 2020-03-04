@@ -105,7 +105,7 @@ public class Files {
 
     public static boolean isFileUpdate(File file) throws IOException {
         String md5 = md5(file);
-        File md5File = new File(file.getPath() + ".md5");
+        File md5File = new File("/data/local/tmp/", file.getPath().replace("/", "_").replace("\\", "_") + ".md5");
         if (md5File.exists()) {
             String old = FileUtils.readFileToString(md5File);
             if (old.equals(md5)) {

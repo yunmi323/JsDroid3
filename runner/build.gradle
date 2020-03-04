@@ -39,5 +39,5 @@ dependencies {
     implementation project(":app-hidden-api")
     implementation project(":ipc")
     implementation project(":api")
-    implementation files("sdk/sdk-1.0.jar")
+    implementation files("sdk/sdk.jar")
 }

@@ -42,7 +42,10 @@ public class JsDroidAppImpl implements IJsDroidApp {
             @Override
             public void run() {
                 if (toast != null) {
-                    toast.cancel();
+                    try {
+                        toast.cancel();
+                    } catch (Exception e) {
+                    }
                 }
                 toast = Toast.makeText(application, text, Toast.LENGTH_LONG);
                 toast.show();

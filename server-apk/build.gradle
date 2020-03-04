@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 29
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "com.jsdroid.server_apk"
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
