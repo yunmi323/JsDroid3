@@ -1,6 +1,8 @@
 ### 欢迎使用JsDroid3.0！
 #### 介绍
 JsDroid3去除了JsDroid2多余的功能，追求以最简单化的方式开发最需要的功能。
+#### 文档(感谢痞老板贡献文档！)
+http://showdoc.jsdroid.com/web/#/20
 #### 下载
 - 电脑下载
 
@@ -53,7 +55,7 @@ jsd debug D:/JsDroid3/demo/demo01
 ```
 jsd pack D:/JsDroid3/demo/demo01
 ```
- 
+
 #### 创建项目
 ```
 d:
@@ -236,7 +238,7 @@ def value = readConfig("key","默认值")
 print value
 ```
 
-  
+
 #### 目前发现的问题
 1.部分手机调试代码会出现下图异常(已修复)
 ![](err/err1.png)
