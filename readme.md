@@ -1,6 +1,10 @@
 ### 欢迎使用JsDroid3.0！
 #### 介绍
 JsDroid3去除了JsDroid2多余的功能，追求以最简单化的方式开发最需要的功能。
+#### 工具(开发中)
+
+![](capture/runscript.gif)
+
 #### 文档(感谢痞老板贡献文档~)
 http://showdoc.jsdroid.com/web/#/20
 #### 下载
