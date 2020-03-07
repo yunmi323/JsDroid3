@@ -200,6 +200,24 @@ if(nodes){
 
 }
 ```
+- GNode遍历节点
+
+```groovy
+//定义数组保存遍历结果
+def textArray=[]
+//遍历所有文字
+GNode.eachNode{
+node->
+    //获取节点的文字
+    def text = node.text
+    if(text){
+        //将文字保存到数组textArray
+        textArray.add(text)
+    }
+}
+//输出数组，将每项用换行符"\n"隔开
+print textArray.join("\n")
+```
 
 - inputText 输入文字
 
@@ -244,8 +262,6 @@ print value
 
 
 #### 目前发现的问题
-1.部分手机调试代码会出现下图异常(已修复)
-![](err/err1.png)
 
 #### 许可
 个人随意，商业授权找who(qq980008027)，很便宜，可定制。
