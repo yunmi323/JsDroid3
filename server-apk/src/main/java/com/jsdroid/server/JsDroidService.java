@@ -41,6 +41,7 @@ public class JsDroidService implements IJsDroidService {
                 return jsDroidShell;
             } else {
                 JsDroidShell jsDroidShell = createJsDroidShell(app);
+                jsDroidShell.setServiceProxy(serviceProxy);
                 appMap.put(pkg, jsDroidShell);
                 return jsDroidShell;
             }

@@ -1,6 +1,10 @@
 package com.jsdroid.sdk.nodes;
 
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import groovy.lang.Closure;
 
 import java.util.ArrayList;
@@ -32,7 +36,19 @@ public class Nodes {
         }
         return result;
     }
-
+    public String getNodeJson(){
+        List<Node> rootNodes = getRootNodes();
+        JSONArray jsonArray = new JSONArray();
+        if (rootNodes != null) {
+            for (Node rootNode : rootNodes) {
+                try {
+                    jsonArray.put(rootNode.getJson());
+                } catch (JSONException e) {
+                }
+            }
+        }
+        return jsonArray.toString();
+    }
     public void eachNode(Node.NodeEach nodeEach) {
         List<Node> rootNodes = getRootNodes();
         for (Node rootNode : rootNodes) {
