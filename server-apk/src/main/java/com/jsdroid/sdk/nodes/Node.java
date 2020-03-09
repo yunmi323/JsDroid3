@@ -1,10 +1,14 @@
 package com.jsdroid.sdk.nodes;
 
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
+
 import com.jsdroid.sdk.devices.Devices;
 import com.jsdroid.sdk.events.Events;
+
 import groovy.lang.Closure;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,6 +79,9 @@ public class Node {
     private Node fromChild;
 
     private void fetchParent() {
+        if (parent != null) {
+            return;
+        }
         AccessibilityNodeInfo parentNodeInfo = findParent(this.nodeInfo);
         if (parentNodeInfo != null) {
             parent = new Node(parentNodeInfo);
@@ -138,8 +145,7 @@ public class Node {
     }
 
     private AccessibilityNodeInfo findParent(AccessibilityNodeInfo nodeInfo) {
-        int id = UiAutomationService.getInstance().getConnectionId();
-        return NodeFinder.getInstance().findNode(id, nodeInfo.getWindowId(), NodeHelper.getParentId(nodeInfo));
+        return nodeInfo.getParent();
     }
 
     private String toString(CharSequence text) {
@@ -188,7 +194,7 @@ public class Node {
     }
 
     public Rect getRect() {
-        return getVisibleBounds(nodeInfo);
+        return getVisibleBounds();
     }
 
     public Node getParent() {
@@ -275,20 +281,33 @@ public class Node {
         return ret;
     }
 
-    private Rect getVisibleBounds(AccessibilityNodeInfo node) {
+    private Rect getVisibleBounds() {
+
         // Get the object bounds in screen coordinates
         Rect ret = new Rect();
-        node.getBoundsInScreen(ret);
+        if (nodeInfo == null) {
+            return ret;
+        }
+        nodeInfo.getBoundsInScreen(ret);
+        if (ret.right < ret.left) {
+            ret.right = ret.left;
+        }
+        if (ret.bottom < ret.top) {
+            ret.bottom = ret.top;
+        }
         Rect screen = new Rect(0, 0, Devices.getInstance().getWidth(), Devices.getInstance().getHeight());
         ret.intersect(screen);
         // Find the visible bounds of our first scrollable ancestor
-        AccessibilityNodeInfo ancestor;
-        for (ancestor = node.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
+        Node ancestor;
+        for (ancestor = getParent(); ancestor != null; ancestor = ancestor.getParent()) {
             if (ancestor.isScrollable()) {
-                Rect ancestorRect = getVisibleBounds(ancestor);
+                Rect ancestorRect = ancestor.getVisibleBounds();
                 ret.intersect(ancestorRect);
                 break;
             }
+        }
+        if (ret.bottom < 0) {
+            Log.d("JsDroid", "getVisibleBounds: " + ret);
         }
         return ret;
     }
@@ -305,6 +324,14 @@ public class Node {
 
     public void performAction(int action) {
         nodeInfo.performAction(action);
+    }
+
+    public void performClick() {
+        performAction(AccessibilityNodeInfo.ACTION_CLICK);
+    }
+
+    public void setText(String text) {
+        nodeInfo.setText(text);
     }
 
     public boolean eachNode(Closure each) {

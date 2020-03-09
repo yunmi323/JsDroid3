@@ -1,6 +1,7 @@
 package com.jsdroid.sdk.inputs;
 
 import com.jsdroid.app_hidden_api.InputUtil;
+import com.jsdroid.sdk.nodes.UiAutomationService;
 
 import java.util.Stack;
 
@@ -24,7 +25,7 @@ public class Inputs {
         String ime_id = System.getenv("ime_id");
         if (ime_id != null) {
             InputUtil.setInputMethod(ime_id);
-        }
+        } 
     }
 
     public void closeInputMethod() {

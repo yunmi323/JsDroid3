@@ -26,7 +26,14 @@ public class Nodes {
     }
 
     public List<Node> getRootNodes() {
+
         List<Node> result = new ArrayList<>();
+        try {
+            //初始化失败
+            UiAutomationService.getInstance().init();
+        } catch (Throwable e) {
+            return result;
+        }
         List<AccessibilityNodeInfo> rootNodes = UiAutomationService.getInstance().getRootNodes();
         if (rootNodes != null) {
             for (AccessibilityNodeInfo rootNode : rootNodes) {
@@ -36,7 +43,8 @@ public class Nodes {
         }
         return result;
     }
-    public String getNodeJson(){
+
+    public String getNodeJson() {
         List<Node> rootNodes = getRootNodes();
         JSONArray jsonArray = new JSONArray();
         if (rootNodes != null) {
@@ -49,6 +57,7 @@ public class Nodes {
         }
         return jsonArray.toString();
     }
+
     public void eachNode(Node.NodeEach nodeEach) {
         List<Node> rootNodes = getRootNodes();
         for (Node rootNode : rootNodes) {

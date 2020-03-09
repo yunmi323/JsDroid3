@@ -1,5 +1,6 @@
 package com.jsdroid.sdk.screens;
 
+
 import com.jsdroid.sdk.devices.Devices;
 
 public class ScreenUtil {
