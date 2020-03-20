@@ -6,14 +6,15 @@ http://showdoc.jsdroid.com/web/#/20
 #### 软件下载
 - 电脑端
 
-  JsDroid: [http://oss.beijing.jsdroid.com/jsdroid3/jsdroid-qt-windows-x86.exe](http://oss.beijing.jsdroid.com/jsdroid3/jsdroid-qt-windows-x86.exe)
+   JsDroid: [http://oss.beijing.jsdroid.com/jsdroid3/jsdroid-qt-windows-x86.exe](http://oss.beijing.jsdroid.com/jsdroid3/jsdroid-qt-windows-x86.exe)
 
-  JSDK: [http://oss.beijing.jsdroid.com/jsdroid3/jsdk.exe](http://oss.beijing.jsdroid.com/jsdroid3/jsdk.exe)
+   JSDK: [http://oss.beijing.jsdroid.com/jsdroid3/jsdk.exe](http://oss.beijing.jsdroid.com/jsdroid3/jsdk.exe)
 
-  IDEA: [https://download-cf.jetbrains.com/idea/ideaIC-2019.3.4.exe](https://download-cf.jetbrains.com/idea/ideaIC-2019.3.4.exe)
+   IDEA: [https://download-cf.jetbrains.com/idea/ideaIC-2019.3.4.exe](https://download-cf.jetbrains.com/idea/ideaIC-2019.3.4.exe)
 
 - 手机端
-  JsDroid: [http://oss.beijing.jsdroid.com/jsdroid3/JsDroid3.0.apk](http://oss.beijing.jsdroid.com/jsdroid3/JsDroid3.0.apk)
+
+   JsDroid: [http://oss.beijing.jsdroid.com/jsdroid3/JsDroid3.0.apk](http://oss.beijing.jsdroid.com/jsdroid3/JsDroid3.0.apk)
 
 #### 软件截图
 
