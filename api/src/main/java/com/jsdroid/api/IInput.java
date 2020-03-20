@@ -30,4 +30,7 @@ public interface IInput extends IpcService {
 
     @Timeout(1000)
     void inputUnspecified() throws InterruptedException;
+
+    @Timeout(1000)
+    boolean hasOpen() throws InterruptedException;
 }

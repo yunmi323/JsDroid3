@@ -60,7 +60,7 @@ public class ScriptOptionView extends LinearLayout {
                 addOption(key, name, value);
             }
         } catch (Exception e) {
-            Log.e("JsDroid", "loadOptions: ", e);
+            Log.d("JsDroid", "loadOptions: ", e);
         }
     }
 

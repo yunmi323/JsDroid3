@@ -1,135 +1,18 @@
 ### 欢迎使用JsDroid3.0！
 #### 介绍
 JsDroid3去除了JsDroid2多余的功能，追求以最简单化的方式开发最需要的功能。
-#### 工具(开发中)
-
-![](capture/runscript.gif)
-
 #### 文档(感谢痞老板贡献文档~)
 http://showdoc.jsdroid.com/web/#/20
-#### 下载
-- 电脑下载
+#### 软件下载
+- 电脑端
+JsDroid: http://oss.beijing.jsdroid.com/jsdroid3/jsdroid-qt-windows-x86.exe
+JSDK: http://oss.beijing.jsdroid.com/jsdroid3/jsdk.exe
+IDEA: https://download-cf.jetbrains.com/idea/ideaIC-2019.3.4.exe
 
-http://oss.beijing.jsdroid.com/jsdroid3/JsDroid3.0%E9%A2%84%E8%A7%88%E7%89%88.zip
+- 手机端
+JsDroid: http://oss.beijing.jsdroid.com/jsdroid3/JsDroid3.0.apk
 
-- 手机下载
-
-http://oss.beijing.jsdroid.com/jsdroid3/JsDroid3.0%E9%A2%84%E8%A7%88%E7%89%88.apk
-
-- adb工具下载
-
-http://oss.beijing.jsdroid.com/jsdroid3/adb.zip
-
-#### 如何使用
-1.电脑下载JsDroid3.zip
-
-2.手机安装JsDroid3并启动
-
-3.将JsDroid3.zip解压到D:/JsDroid3，并且将adb工具复制到D:/JsDroid3/bin
-
-4.电脑添加环境变量path=D:/JsDroid3/bin
-
-5.手机打开开发者模式，并且连接电脑
-
-6.电脑打开命令行程序输入以下命令对demo项目编译：
-```
-D:
-cd D:/JsDroid3/demo/demo01
-jsd build
-```
-
-7.打开文件D:/JsDroid3/demo/demo01/src/MainScript.groovy
-
-8.在MainScript.groovy中编写代码，如下：
-```groovy
-toast "我爱JsDroid3!"
-```
-
-9.输入命令调试
-```
-cd D:/JsDroid3/demo/demo01
-jsd debug 
-```
-或者
-```
-jsd debug D:/JsDroid3/demo/demo01
-```
-
-10.打包apk
-```
-jsd pack D:/JsDroid3/demo/demo01
-```
-
-#### 创建项目
-```
-d:
-mkdir d:/project
-cd d:/project
-jsd create helloworld
-
-```
-
-#### 项目结构
-
-```
-|-- 项目路径
-  |-- src
-    |-- MainScript.groovy 脚本入口
-  |-- res
-    |-- option.json 配置
-    |-- readme.md 帮助
-  |-- config.json 项目参数
-  |-- icon.png 项目图标，建议1024x1024格式图片
-```
-
-#### 界面配置
-option.json
-```
-{
-    "key1":{
-        "name":"配置1",
-        "value":"默认值1"
-    },
-    "key2":{
-        "name":"配置2",
-        "value":"默认值2"
-    }
-}
-```
-
-#### 编译项目
-```
-d:
-cd d:/project/helloworld
-jsd build
-```
-编译成功后得到文件：d:/project/helloworld/dist/helloworld.jsd
-
-#### 调试
-```
-d:
-cd d:/project/helloworld
-jsd debug
-```
-或者
-```
-jsd debug d:/project/helloworld
-```
-
-#### 运行jsd文件
-```
-jsd run d:/project/helloworld/dist/helloworld.jsd
-```
-#### 打包apk
-```
-d:
-cd d:/project/helloworld
-jsd pack
-```
-打包成功后得到文件：d:/project/helloworld/dist/helloworld.apk
-
-
-
+#### 软件截图
 
 #### 常用命令
 
@@ -260,8 +143,6 @@ def value = readConfig("key","默认值")
 print value
 ```
 
-
-#### 目前发现的问题
 
 #### 许可
 个人随意，商业授权找who(qq980008027)，很便宜，可定制。

@@ -99,6 +99,14 @@ build.doLast {
 
     })
 }
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+
+
+//先build app，然后执行此任务
+task jsdroidApi(type: Zip, dependsOn: ['build'], group: "jsdroid") {
+    metadataCharset "UTF-8"
+    extension "zip"
+    archiveName = "jsdroid-api.jar"
+    destinationDir file('build/')
+    from fileTree("build/intermediates/javac/release/compileReleaseJavaWithJavac/classes")
+
 }

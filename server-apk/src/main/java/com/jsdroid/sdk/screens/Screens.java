@@ -1,7 +1,6 @@
 package com.jsdroid.sdk.screens;
 
 import android.graphics.Bitmap;
-import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.media.Image;
 import android.media.ImageReader;
@@ -11,7 +10,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.Surface;
 
-import com.jsdroid.app_hidden_api.SurfacesControls;
+import com.jsdroid.app_hidden_api.SurfaceControls;
 import com.jsdroid.sdk.devices.Devices;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class Screens {
         devices = Devices.getInstance();
         captureThread = new HandlerThread("screen");
         captureThread.start();
-        display = SurfacesControls.createDisplay("screen", false);
+        display = SurfaceControls.createDisplay("screen", false);
 
     }
 
@@ -173,10 +172,10 @@ public class Screens {
 
     private ImageReader createImageReader() {
         ImageReader imageReader = ImageReader.newInstance(screenWidth, screenHeight,0x1, 1);
-        SurfacesControls.openTransaction();
-        SurfacesControls.setDisplaySurface(display, imageReader.getSurface());
-        SurfacesControls.setDisplayLayerStack(display, 0);
-        SurfacesControls.closeTransaction();
+        SurfaceControls.openTransaction();
+        SurfaceControls.setDisplaySurface(display, imageReader.getSurface());
+        SurfaceControls.setDisplayLayerStack(display, 0);
+        SurfaceControls.closeTransaction();
         imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader imageReader) {

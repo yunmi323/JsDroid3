@@ -3,7 +3,6 @@ package com.jsdroid.server;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.jsdroid.api.IJsDroidApp;
 import com.jsdroid.api.IJsDroidShell;
@@ -72,6 +71,7 @@ public class JsDroidShell implements IJsDroidShell {
         this.app = app;
         this.pkg = app.getPackage();
         listenVolumeDown();
+
     }
 
     public void setApp(IJsDroidApp app) throws InterruptedException {

@@ -230,6 +230,19 @@ public abstract class JsDroidScript extends Script {
         }
     }
 
+    @MethodDoc("判断输入法是否打开")
+    public boolean hasInputOpen() {
+        Apps runnerApp = Apps.getRunnerApp();
+        if (runnerApp != null) {
+            try {
+                IInput input = runnerApp.getInput();
+                return input.hasOpen();
+            } catch (Exception e) {
+            }
+        }
+        return false;
+    }
+
     @MethodDoc("清除文字")
     public void clearText(@FieldName("光标前位数") int before, @FieldName("光标后位数") int after) {
         Apps runnerApp = Apps.getRunnerApp();

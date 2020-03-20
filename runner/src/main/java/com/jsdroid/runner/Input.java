@@ -1,6 +1,7 @@
 package com.jsdroid.runner;
 
 import android.inputmethodservice.InputMethodService;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
 import com.jsdroid.api.IInput;
@@ -56,9 +57,27 @@ public class Input extends InputMethodService implements IInput {
         performAction(EditorInfo.IME_ACTION_UNSPECIFIED);
     }
 
+    @Override
+    public boolean hasOpen() throws InterruptedException {
+
+        return open;
+    }
+
 
     @Override
     public boolean needGc() {
         return false;
+    }
+    private boolean open;
+    @Override
+    public void onStartInput(EditorInfo attribute, boolean restarting) {
+        super.onStartInput(attribute, restarting);
+        open=true;
+    }
+
+    @Override
+    public void onFinishInput() {
+        super.onFinishInput();
+        open=false;
     }
 }
