@@ -127,6 +127,7 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
     @Override
     public void handleMessage(@NonNull UiMessageUtils.UiMessage localMessage) {
         switch (localMessage.getId()) {
+            case UiMessage.SRIPT_HAS_START:
             case UiMessage.SRIPT_START:
                 setRunning(true);
                 break;

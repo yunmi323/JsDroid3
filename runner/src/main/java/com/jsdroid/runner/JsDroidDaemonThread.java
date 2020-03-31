@@ -69,7 +69,8 @@ public class JsDroidDaemonThread extends Thread {
         return BuildConfig.DEBUG;
     }
 
-    private void startServer() {
+    public void startServer() {
+        Log.d(TAG, "startServer: ");
         //检测旧版端口，如果已经启动，则无需启动
         if (shellCommandListener != null) {
             shellCommandListener.onPreStartJsDroidServer();

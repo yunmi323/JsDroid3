@@ -3,17 +3,20 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 27
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 3
-        versionName "1.0"
+        versionCode JSDROID_VERSION_CODE
+        versionName JSDROID_VERSION
         consumerProguardFiles 'consumer-rules.pro'
 
 
     }
-
     buildTypes {
         release {
             minifyEnabled false

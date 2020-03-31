@@ -1,5 +1,7 @@
 package com.jsdroid.groovy;
 
+import android.util.Log;
+
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilationUnit;
@@ -15,19 +17,14 @@ import groovyjarjarasm.asm.ClassWriter;
  * 通过此类编译groovy代码
  */
 final class AndroidGroovyClassLoader extends groovy.lang.GroovyClassLoader {
-    public AndroidGroovyClassLoader() {
-    }
+    DexBytecodeProcessor dexBytecodeProcessor;
 
-    public AndroidGroovyClassLoader(ClassLoader loader) {
-        super(loader);
-    }
+    private ClassLoader parent;
 
-    public AndroidGroovyClassLoader(CompilerConfiguration config) {
-        this(Thread.currentThread().getContextClassLoader(), config);
-    }
-
-    public AndroidGroovyClassLoader(ClassLoader loader, CompilerConfiguration config) {
+    public AndroidGroovyClassLoader(ClassLoader loader, CompilerConfiguration config, DexBytecodeProcessor dexBytecodeProcessor) {
         super(loader, config);
+        this.parent = loader;
+        this.dexBytecodeProcessor = dexBytecodeProcessor;
     }
 
     /**
@@ -40,10 +37,27 @@ final class AndroidGroovyClassLoader extends groovy.lang.GroovyClassLoader {
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
         try {
-            return super.loadClass(name);
+            Class clazz = super.loadClass(name);
+            if (clazz != null) {
+                return clazz;
+            }
         } catch (Throwable e) {
-            throw new ClassNotFoundException();
+            Log.e("JsDroid", "loadClass: ", e);
         }
+        return parentLoadClass(name);
+    }
+
+    private Class parentLoadClass(String name) throws ClassNotFoundException {
+        try {
+            Class clazz = parent.loadClass(name);
+            if (clazz != null) {
+                return clazz;
+            }
+        } catch (Throwable e) {
+            Log.e("JsDroid", "loadClass: ", e);
+        }
+        Log.e("JsDroid", "loadClass: ", new Exception());
+        throw new ClassNotFoundException();
     }
 
     /**
@@ -62,7 +76,7 @@ final class AndroidGroovyClassLoader extends groovy.lang.GroovyClassLoader {
         try {
             return super.loadClass(name, lookupScriptFiles, preferClassOverScript, resolve);
         } catch (Throwable e) {
-            throw new ClassNotFoundException();
+            return parentLoadClass(name);
         }
     }
 
@@ -81,7 +95,7 @@ final class AndroidGroovyClassLoader extends groovy.lang.GroovyClassLoader {
         try {
             return super.loadClass(name, lookupScriptFiles, preferClassOverScript);
         } catch (Throwable e) {
-            throw new ClassNotFoundException();
+            return parentLoadClass(name);
         }
     }
 
@@ -98,7 +112,7 @@ final class AndroidGroovyClassLoader extends groovy.lang.GroovyClassLoader {
         try {
             return super.loadClass(name, resolve);
         } catch (Throwable e) {
-            throw new ClassNotFoundException();
+            return parentLoadClass(name);
         }
     }
 
@@ -120,12 +134,16 @@ final class AndroidGroovyClassLoader extends groovy.lang.GroovyClassLoader {
             @Override
             protected Class onClassNode(ClassWriter classWriter, ClassNode classNode) {
                 try {
-                    Class result = super.onClassNode(classWriter, classNode);
-                    return result;
+                    return super.onClassNode(classWriter, classNode);
                 } catch (Exception e) {
                 }
-
                 return null;
+            }
+
+            @Override
+            protected Class createClass(byte[] code, ClassNode classNode) {
+                dexBytecodeProcessor.processBytecode(classNode, code);
+                return super.createClass(code, classNode);
             }
         };
     }

@@ -3,20 +3,29 @@
     package="com.jsdroid.test">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
-        android:name="com.jsdroid.test.JsdApp"
+        android:name=".JsdApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <service
-            android:name="com.jsdroid.test.JsdService"
-            android:enabled="true"
-            android:exported="true"></service>
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".HelpActivity"></activity>
+        <activity android:name=".LogActivity" />
 
-        <activity android:name="com.jsdroid.test.MainActivity">
+        <service
+            android:name=".JsdService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

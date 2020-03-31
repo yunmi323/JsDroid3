@@ -25,8 +25,9 @@ public class Inputs {
         String ime_id = System.getenv("ime_id");
         if (ime_id != null) {
             InputUtil.setInputMethod(ime_id);
-        } 
+        }
     }
+
 
     public void closeInputMethod() {
         openInputMethod();

@@ -8,5 +8,6 @@ public class UiMessage {
     public static final int OPTION_CHANGED = 5;
     public static final int SRIPT_START = 6;
     public static final int SRIPT_STOP = 7;
+    public static final int SRIPT_HAS_START = 8;
 
 }

@@ -1,5 +1,6 @@
 package com.jsdroid.test;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -12,19 +13,8 @@ import android.widget.CompoundButton;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.util.DebugUtils;
 
-import com.blankj.utilcode.util.ActivityUtils;
-import com.blankj.utilcode.util.CloneUtils;
-import com.blankj.utilcode.util.CloseUtils;
-import com.blankj.utilcode.util.CollectionUtils;
-import com.blankj.utilcode.util.DeviceUtils;
 import com.blankj.utilcode.util.UiMessageUtils;
-import com.blankj.utilcode.util.Utils;
-import com.blankj.utilcode.util.VibrateUtils;
-import com.jsdroid.test.adapter.MainTabAdapter;
-import com.jsdroid.test.widget.LogView;
-import com.jsdroid.test.widget.ScriptInfoView;
 import com.jsdroid.test.widget.ScriptOptionView;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -36,8 +26,6 @@ import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
-import com.qmuiteam.qmui.widget.QMUIViewPager;
-import com.qmuiteam.qmui.widget.tab.QMUITabSegment;
 import com.yhao.floatwindow.SdkVersion;
 
 public class MainActivity extends AppCompatActivity implements UiMessageUtils.UiMessageCallback {
@@ -45,12 +33,7 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
     private Toolbar toolBar;
     private AccountHeader accountHeader;
     private Drawer drawer;
-    private QMUITabSegment tabSegment;
-    private QMUIViewPager tabPage;
-    private MainTabAdapter tabAdapter;
-    private ScriptInfoView scriptInfoView;
-    private ScriptOptionView scriptOptionTabView;
-    private LogView logView;
+    private ScriptOptionView optionView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,17 +93,24 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
             }
         }));
 
-        scriptInfoView = new ScriptInfoView(this);
-        scriptOptionTabView = new ScriptOptionView(this);
-        logView = new LogView(this);
-        tabAdapter = new MainTabAdapter(scriptInfoView, scriptOptionTabView, logView);
-        tabPage.setAdapter(tabAdapter);
-        tabSegment.setupWithViewPager(tabPage);
-        tabPage.setSwipeable(true);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add("帮助").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                startActivity(new Intent(MainActivity.this, HelpActivity.class));
+                return false;
+            }
+        }).setIcon(R.drawable.ic_help).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add("日志").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                startActivity(new Intent(MainActivity.this, LogActivity.class));
+                return false;
+            }
+        }).setIcon(R.drawable.ic_log).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menu.add("运行").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -128,27 +118,21 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
                 return false;
             }
         }).setIcon(R.drawable.ic_play).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+
         return super.onCreateOptionsMenu(menu);
     }
 
     private void initView() {
         toolBar = (Toolbar) findViewById(R.id.toolBar);
-        tabSegment = (QMUITabSegment) findViewById(R.id.tabSegment);
-        tabPage = (QMUIViewPager) findViewById(R.id.tabPage);
-
+        optionView = (ScriptOptionView) findViewById(R.id.optionView);
     }
 
     @Override
     public void handleMessage(@NonNull UiMessageUtils.UiMessage localMessage) {
         switch (localMessage.getId()) {
-            case UiMessage.PRINT:
-                logView.appendText(localMessage.getObject() + "\n");
-                break;
-            case UiMessage.LOAD_SCRIPT:
-                scriptInfoView.loadHelp();
-                break;
             case UiMessage.OPTION_CHANGED:
-                scriptOptionTabView.loadOptions(localMessage.getObject());
+                optionView.loadOptions(localMessage.getObject());
                 break;
         }
     }
@@ -164,8 +148,4 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
         super.finish();
     }
 
-    @Override
-    public void onBackPressed() {
-        ActivityUtils.startHomeActivity();
-    }
 }

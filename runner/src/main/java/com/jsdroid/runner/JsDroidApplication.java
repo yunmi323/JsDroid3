@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.webkit.JavascriptInterface;
 
 import com.jsdroid.api.IJsDroidShell;
 import com.jsdroid.api.annotations.Doc;
@@ -120,11 +121,17 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
         return null;
     }
 
+    @JavascriptInterface
+    public String readConfig(String key) {
+        return readConfig(key, null);
+    }
+
     public String readConfig(String key, String defaultValue) {
         SharedPreferences sharedPreferences = getSharedPreferences(getPackageName(), 0);
         return sharedPreferences.getString(key, defaultValue);
     }
 
+    @JavascriptInterface
     public void saveConfig(String key, String value) {
         SharedPreferences sharedPreferences = getSharedPreferences(getPackageName(), 0);
         SharedPreferences.Editor edit = sharedPreferences.edit();
@@ -166,6 +173,26 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
     @Override
     public void onJsDroidConnected() {
         connected = true;
+        try {
+            checkVersion();
+        } catch (Exception e) {
+            //版本不同，需要启动新版本
+            jsDroidDaemonThread.startServer();
+
+        }
+    }
+
+    public void checkVersion() throws Exception {
+        IJsDroidShell jsDroidShell = getJsDroidShell();
+        int versionCode = jsDroidShell.versionCode();
+        if (versionCode == 0) {
+            Log.d("JsDroid", "版本更新");
+            throw new Exception("version update");
+        }
+        if (BuildConfig.VERSION_CODE > versionCode) {
+            Log.d("JsDroid", "版本更新：" + versionCode);
+            throw new Exception("version update");
+        }
     }
 
     @Doc("JsDroid服务连接断开时触发")

@@ -8,6 +8,7 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
 import java.util.UUID;
 
 import dalvik.system.DexClassLoader;
@@ -29,23 +30,22 @@ public class AndroidGroovyScriptLoader {
         this.dexOptDir = dexOptDir;
         this.dexTmpDir = dexTmpDir;
         this.scriptBaseClass = scriptBaseClass;
-
     }
 
     public Script loadScript(Script parent, String sourceText, String fileName) throws IOException {
         DexBytecodeProcessor bytecodeProcessor = new DexBytecodeProcessor();
         CompilerConfiguration configuration = new CompilerConfiguration();
         configuration.setScriptBaseClass(scriptBaseClass);
-        configuration.setBytecodePostprocessor(bytecodeProcessor);
         ClassLoader parentClassLoader = AndroidGroovyScriptLoader.class.getClassLoader();
         if (parent != null) {
             parentClassLoader = parent.getClass().getClassLoader();
         }
-        AndroidGroovyClassLoader androidGroovyClassLoader = new AndroidGroovyClassLoader(parentClassLoader, configuration);
+        AndroidGroovyClassLoader androidGroovyClassLoader = new AndroidGroovyClassLoader(parentClassLoader, configuration, bytecodeProcessor);
         try {
             androidGroovyClassLoader.parseClass(sourceText, fileName);
         } catch (Throwable e) {
             e.printStackTrace();
+            Log.e("JsDroid", "loadScript: ",e );
         }
         Script script = createScript(parentClassLoader, bytecodeProcessor);
         if (script != null && parent != null) {
@@ -65,7 +65,21 @@ public class AndroidGroovyScriptLoader {
             Class scriptClass = null;
             DexClassLoader loader = new DexClassLoader(tmpDex.getPath(), dexOptDir,
                     null,
-                    parentClassLoader);
+                    parentClassLoader) {
+                @Override
+                public Class<?> loadClass(String s) throws ClassNotFoundException {
+                    try {
+                        return super.loadClass(s);
+                    } catch (ClassNotFoundException e) {
+                        ClassLoader parent = getParent();
+                        if (parent != null) {
+                            return parent.loadClass(s);
+                        }
+                        throw new ClassNotFoundException();
+                    }
+
+                }
+            };
             for (String className : bytecodeProcessor.getClassNames()) {
                 Class<?> aClass = loader.loadClass(className);
                 if (Script.class.isAssignableFrom(aClass)) {

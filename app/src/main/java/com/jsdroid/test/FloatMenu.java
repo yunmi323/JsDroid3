@@ -28,6 +28,7 @@ public class FloatMenu implements UiMessageUtils.UiMessageCallback {
                 }
                 break;
             case UiMessage.SRIPT_START:
+            case UiMessage.SRIPT_HAS_START:
                 hide();
                 FloatLogo.getInstance().show();
                 break;

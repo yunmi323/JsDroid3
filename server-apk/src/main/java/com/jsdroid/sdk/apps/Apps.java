@@ -1,9 +1,8 @@
 package com.jsdroid.sdk.apps;
 
-import android.util.Log;
-
 import com.jsdroid.api.IInput;
 import com.jsdroid.api.IJsDroidApp;
+import com.jsdroid.commons.ShellUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,20 +30,31 @@ public class Apps {
     }
 
     public synchronized static void putApp(String pkg, IJsDroidApp app) {
-        Apps apps = new Apps(pkg, app);
+        Apps apps = instanceMap.get(pkg);
+        if (apps == null) {
+            apps = new Apps(pkg, app);
+        } else {
+            apps.setApp(app);
+        }
         String app_pkg = System.getenv("app_pkg");
         if (pkg.equals(app_pkg)) {
             runnerApp = apps;
+            apps.isRunnerApp = true;
         }
         instanceMap.put(pkg, apps);
     }
 
     private String pkg;
     private IJsDroidApp app;
+    private boolean isRunnerApp;
 
     public Apps(String pkg, IJsDroidApp app) {
         this.pkg = pkg;
         this.app = app;
+    }
+
+    public String getPkg() {
+        return pkg;
     }
 
     public static void loadScript(String file) throws InterruptedException {
@@ -87,14 +97,24 @@ public class Apps {
     public void toast(Object value) {
         try {
             app.toast("" + value);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            startAppService();
         }
     }
+
+    //连接断开，重启app服务
+    public void startAppService() {
+        if (isRunnerApp) {
+            ShellUtil.exec("am startservice -n " + pkg + "/com.jsdroid.runner.JsDroidService");
+        }
+    }
+
 
     private void doPrint(String text) {
         try {
             app.print(text);
         } catch (Exception e) {
+            startAppService();
         }
         if ("jsd.exe".equals(pkg)) {
             Apps defaultApp = getDefaultApp();
@@ -127,5 +147,9 @@ public class Apps {
 
     public IJsDroidApp getApp() {
         return app;
+    }
+
+    public void setApp(IJsDroidApp app) {
+        this.app = app;
     }
 }

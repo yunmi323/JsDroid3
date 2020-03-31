@@ -168,5 +168,8 @@ public interface IJsDroidShell extends IpcService {
     @Timeout(1000)
     boolean isRunning() throws InterruptedException;
 
+    @Timeout(1000)
+    int versionCode() throws InterruptedException;
+
 
 }

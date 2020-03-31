@@ -40,9 +40,7 @@ public class PluginClassLoader extends ClassLoader {
     private Map<String, PluginDexClassLoader> classLoaderMap = new HashMap<>();
 
     public void add(String file) throws IOException {
-        if (classLoaderMap.containsKey(file)) {
-            return;
-        }
+
         PluginDexClassLoader dexClassLoader = new PluginDexClassLoader(file,
                 JsDroidEnv.optDir, JsDroidEnv.libDir, PluginClassLoader.class.getClassLoader());
         classLoaderMap.put(file, dexClassLoader);
@@ -67,7 +65,7 @@ public class PluginClassLoader extends ClassLoader {
             } catch (Throwable e) {
             }
         }
-        throw new ClassNotFoundException();
+        return Thread.currentThread().getContextClassLoader().loadClass(name);
     }
 
     @Override

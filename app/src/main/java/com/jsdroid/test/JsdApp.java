@@ -2,11 +2,17 @@ package com.jsdroid.test;
 
 import android.content.res.Configuration;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
+
+import androidx.lifecycle.ProcessLifecycleOwnerInitializer;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.UiMessageUtils;
 import com.blankj.utilcode.util.ZipUtils;
@@ -20,6 +26,7 @@ public class JsdApp extends JsDroidApplication {
     private String scriptFile;
     private boolean volumeControl;
     private boolean showFloatView;
+    ProcessLifecycleOwnerInitializer s;
 
     @Override
     public void onCreate() {
@@ -29,16 +36,8 @@ public class JsdApp extends JsDroidApplication {
         FloatLogo.getInstance().init(this);
         FloatMenu.getInstance().init(this);
         if (showFloatView) {
-            //3秒后显示
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    FloatLogo.getInstance().show();
-                }
-            }, 3000);
-
+            FloatLogo.getInstance().show();
         }
-
     }
 
     @Override
@@ -51,9 +50,18 @@ public class JsdApp extends JsDroidApplication {
     @Override
     public void onJsDroidConnected() {
         super.onJsDroidConnected();
-
         UiMessageUtils.getInstance().send(UiMessage.JSDROID_CONNECT);
+        JsdLog.print("服务连接");
         UiMessageUtils.getInstance().send(UiMessage.PRINT, "服务连接.");
+        //判断是否运行
+        if (isRunning()) {
+            UiMessageUtils.getInstance().send(UiMessage.SRIPT_HAS_START);
+        }
+    }
+
+    public void print(String text) {
+        JsdLog.print(text + "\n");
+        UiMessageUtils.getInstance().send(UiMessage.PRINT, text + "\n");
     }
 
     @Override
@@ -66,6 +74,7 @@ public class JsdApp extends JsDroidApplication {
     public void onScriptStop(String result) {
         super.onScriptStop(result);
         if (result != null) {
+            JsdLog.print(result);
             UiMessageUtils.getInstance().send(UiMessage.PRINT, result);
             UiMessageUtils.getInstance().send(UiMessage.SRIPT_STOP, result);
         } else {
@@ -87,12 +96,14 @@ public class JsdApp extends JsDroidApplication {
     @Override
     public void onWaitAdbPort() {
         super.onWaitAdbPort();
+        JsdLog.print("等待免root服务.");
         UiMessageUtils.getInstance().send(UiMessage.PRINT, "等待免root服务.");
     }
 
     @Override
     public void onScriptPrint(String text) {
         super.onScriptPrint(text);
+        JsdLog.print(text);
         UiMessageUtils.getInstance().send(UiMessage.PRINT, text);
     }
 
@@ -174,4 +185,43 @@ public class JsdApp extends JsDroidApplication {
     public boolean isVolumeControl() {
         return volumeControl;
     }
+
+    @JavascriptInterface
+    @Override
+    public void startScript() {
+        super.startScript();
+    }
+
+    @JavascriptInterface
+    @Override
+    public void stopScript() {
+        super.stopScript();
+    }
+
+    @JavascriptInterface
+    @Override
+    public boolean isRunning() {
+        return super.isRunning();
+    }
+
+    @JavascriptInterface
+    public void showFloatMenu() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                FloatLogo.getInstance().show();
+            }
+        });
+    }
+
+    @JavascriptInterface
+    public void hideFloatMenu() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                FloatLogo.getInstance().hide();
+            }
+        });
+    }
+
 }

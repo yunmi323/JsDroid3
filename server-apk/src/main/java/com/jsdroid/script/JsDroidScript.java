@@ -3,6 +3,7 @@ package com.jsdroid.script;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.ActivityThread;
 import android.app.Application;
+import android.app.Service;
 import android.app.UiAutomation;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,8 +12,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 
 import com.genymobile.scrcpy.wrappers.ServiceManager;
@@ -21,6 +24,12 @@ import com.jsdroid.api.IInput;
 import com.jsdroid.api.IJsDroidApp;
 import com.jsdroid.api.annotations.FieldName;
 import com.jsdroid.api.annotations.MethodDoc;
+import com.jsdroid.commons.ActivityUtil;
+import com.jsdroid.commons.BitmapUtil;
+import com.jsdroid.commons.ContextUtil;
+import com.jsdroid.commons.FileUtil;
+import com.jsdroid.commons.Http;
+import com.jsdroid.commons.ScreenUtil;
 import com.jsdroid.findimg.FindImg;
 import com.jsdroid.findpic.FindPic;
 import com.jsdroid.ipc.call.SyncRunnable;
@@ -30,13 +39,15 @@ import com.jsdroid.sdk.directions.Directions;
 import com.jsdroid.sdk.events.Events;
 import com.jsdroid.sdk.files.Files;
 import com.jsdroid.sdk.gestures.Gestures;
+import com.jsdroid.sdk.gestures.PointerGesture;
 import com.jsdroid.sdk.https.Https;
+import com.jsdroid.sdk.inputs.Inputs;
 import com.jsdroid.sdk.libs.Libs;
 import com.jsdroid.sdk.logs.Logs;
 import com.jsdroid.sdk.nodes.Node;
 import com.jsdroid.sdk.nodes.Nodes;
 import com.jsdroid.sdk.nodes.Store;
-import com.jsdroid.sdk.nodes.UiAutomationService;
+import com.jsdroid.sdk.play.SinglePlayer;
 import com.jsdroid.sdk.points.Points;
 import com.jsdroid.sdk.rects.Rects;
 import com.jsdroid.sdk.screens.Screens;
@@ -44,12 +55,17 @@ import com.jsdroid.sdk.scripts.Scripts;
 import com.jsdroid.sdk.shells.Shells;
 import com.jsdroid.sdk.sockets.Sockets;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -59,28 +75,28 @@ import groovy.lang.Closure;
 import groovy.lang.Script;
 
 public abstract class JsDroidScript extends Script {
-    private IJsDroidApp app;
-    private String pkg;
-    private Files files;
+    public IJsDroidApp app;
+    public String pkg;
+    public Files files = new Files(this);
+    public Devices device = Devices.getInstance();
+    public Events events = Events.getInstance();
+    public Nodes nodes = Nodes.getInstance();
 
-    static {
-        setFetchNotImportantNodeEnable(true);
-        setFetchWebNodeEnable(true);
+    {
+        try {
+            app = Apps.getRunnerApp().getApp();
+            pkg = Apps.getRunnerApp().getPkg();
+        } catch (Throwable e) {
+        }
     }
 
     @MethodDoc("获取UiAutomation,不知者不推荐使用")
     public static UiAutomation getUiAutomation() {
-        try {
-            Field uiAutomationField = UiAutomationService.class.getDeclaredField("uiAutomation");
-            uiAutomationField.setAccessible(true);
-            return (UiAutomation) uiAutomationField.get(UiAutomationService.getInstance());
-        } catch (Exception e) {
-        }
-        return null;
+        return Nodes.getInstance().getUiAutomation();
     }
 
     @MethodDoc("设置是否获取不重要节点")
-    public static void setFetchNotImportantNodeEnable(boolean enable) {
+    public void setFetchNotImportantNodeEnable(boolean enable) {
         if (enable) {
             addNodeFlag(AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS);
         } else {
@@ -88,9 +104,8 @@ public abstract class JsDroidScript extends Script {
         }
     }
 
-
     @MethodDoc("设置是否开启web增强模式")
-    public static void setFetchWebNodeEnable(boolean enable) {
+    public void setFetchWebNodeEnable(boolean enable) {
         if (enable) {
             addNodeFlag(AccessibilityServiceInfo.FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY);
         } else {
@@ -110,37 +125,29 @@ public abstract class JsDroidScript extends Script {
      * @see AccessibilityServiceInfo#FLAG_REQUEST_ACCESSIBILITY_BUTTON
      */
     @MethodDoc("添加节点标志")
-    public static void addNodeFlag(int flag) {
+    public void addNodeFlag(int flag) {
         try {
-            UiAutomation uiAutomation = getUiAutomation();
-            assert uiAutomation != null;
-            AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
-            serviceInfo.flags |= flag;
-            uiAutomation.setServiceInfo(serviceInfo);
+            try {
+                Nodes.getInstance().addNodeFlag(flag);
+            } catch (Throwable e) {
+            }
         } catch (Throwable e) {
         }
     }
 
     @MethodDoc("删除节点标志")
-    public static void removeNodeFlag(int flag) {
+    public void removeNodeFlag(int flag) {
         try {
-            UiAutomation uiAutomation = getUiAutomation();
-            assert uiAutomation != null;
-            AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
-            serviceInfo.flags &= ~flag;
-            uiAutomation.setServiceInfo(serviceInfo);
+            Nodes.getInstance().removeNodeFlag(flag);
         } catch (Throwable e) {
         }
     }
 
     public JsDroidScript() {
-        files = new Files(this);
     }
 
     public JsDroidScript(Binding binding) {
         super(binding);
-        files = new Files(this);
-
     }
 
     public Object load(String name) throws InterruptedException {
@@ -151,11 +158,24 @@ public abstract class JsDroidScript extends Script {
         return files;
     }
 
+    public Files getFiles() {
+        return files;
+    }
+
     public Logs getGLog() {
         return Logs.getInstance();
     }
 
+    public Logs getgLog() {
+        return Logs.getInstance();
+    }
+
+
     public Https getGHttp() {
+        return Https.getInstance();
+    }
+
+    public Https getgHttp() {
         return Https.getInstance();
     }
 
@@ -163,7 +183,15 @@ public abstract class JsDroidScript extends Script {
         return Sockets.getInstance();
     }
 
+    public Sockets getgSocket() {
+        return Sockets.getInstance();
+    }
+
     public Devices getGDevice() {
+        return Devices.getInstance();
+    }
+
+    public Devices getgDevice() {
         return Devices.getInstance();
     }
 
@@ -171,7 +199,15 @@ public abstract class JsDroidScript extends Script {
         return Directions.getInstance();
     }
 
+    public Directions getgDirection() {
+        return Directions.getInstance();
+    }
+
     public Events getGEvent() {
+        return Events.getInstance();
+    }
+
+    public Events getgEvent() {
         return Events.getInstance();
     }
 
@@ -179,7 +215,15 @@ public abstract class JsDroidScript extends Script {
         return Gestures.getInstance();
     }
 
+    public Gestures getgGesture() {
+        return Gestures.getInstance();
+    }
+
     public Nodes getGNode() {
+        return Nodes.getInstance();
+    }
+
+    public Nodes getgNode() {
         return Nodes.getInstance();
     }
 
@@ -187,7 +231,15 @@ public abstract class JsDroidScript extends Script {
         return Points.getInstance();
     }
 
+    public Points getgPoint() {
+        return Points.getInstance();
+    }
+
     public Rects getGRect() {
+        return Rects.getInstance();
+    }
+
+    public Rects getgRect() {
         return Rects.getInstance();
     }
 
@@ -195,7 +247,15 @@ public abstract class JsDroidScript extends Script {
         return Screens.getInstance();
     }
 
+    public Screens getgScreen() {
+        return Screens.getInstance();
+    }
+
     public Shells getGShell() {
+        return Shells.getInstance();
+    }
+
+    public Shells getgShell() {
         return Shells.getInstance();
     }
 
@@ -241,6 +301,28 @@ public abstract class JsDroidScript extends Script {
             }
         }
         return false;
+    }
+
+    /**
+     * 打开输入法
+     */
+    @MethodDoc("打开输入法")
+    public void openInputMethod() throws InterruptedException {
+        try {
+            Inputs.getInstance().openInputMethod();
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     * 关闭输入法
+     */
+    @MethodDoc("关闭输入法")
+    public void closeInputMethod() {
+        try {
+            Inputs.getInstance().closeInputMethod();
+        } catch (Exception e) {
+        }
     }
 
     @MethodDoc("清除文字")
@@ -376,6 +458,13 @@ public abstract class JsDroidScript extends Script {
             @Override
             public boolean each(Node node) {
                 try {
+                    if (pattern.matcher(node.getClazz()).matches()) {
+                        nodeStore.set(node);
+                        return true;
+                    }
+                } catch (Exception e) {
+                }
+                try {
                     if (pattern.matcher(node.getText()).matches()) {
                         nodeStore.set(node);
                         return true;
@@ -403,6 +492,15 @@ public abstract class JsDroidScript extends Script {
 
     }
 
+    @MethodDoc("查找单个节点")
+    public Node findNode(@FieldName("map") Map map) {
+        try {
+            return Nodes.getInstance().map(map).findOne();
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
     @MethodDoc("查找所有节点")
     public List<Node> findNodeAll(@FieldName("正则表达式") Pattern pattern) {
         final List<Node> nodes = new ArrayList<>();
@@ -410,23 +508,26 @@ public abstract class JsDroidScript extends Script {
             @Override
             public boolean each(Node node) {
                 try {
+                    if (pattern.matcher(node.getClazz()).matches()) {
+                        nodes.add(node);
+                    }
+                } catch (Exception e) {
+                }
+                try {
                     if (pattern.matcher(node.getText()).matches()) {
                         nodes.add(node);
-                        return false;
                     }
                 } catch (Exception e) {
                 }
                 try {
                     if (pattern.matcher(node.getRes()).matches()) {
                         nodes.add(node);
-                        return false;
                     }
                 } catch (Exception e) {
                 }
                 try {
                     if (pattern.matcher(node.getDesc()).matches()) {
                         nodes.add(node);
-                        return false;
                     }
                 } catch (Exception e) {
                 }
@@ -435,6 +536,27 @@ public abstract class JsDroidScript extends Script {
         });
         return nodes;
     }
+
+    @MethodDoc("查找全部节点")
+    public List<Node> findNodeAll(@FieldName("map") Map map) {
+        try {
+            return Nodes.getInstance().map(map).findAll();
+        } catch (Throwable e) {
+            return new LinkedList<>();
+        }
+    }
+
+
+    @MethodDoc("查找所有节点")
+    public List<Node> findNodes(@FieldName("正则表达式") Pattern pattern) {
+        return findNodeAll(pattern);
+    }
+
+    @MethodDoc("查找全部节点")
+    public List<Node> findNodes(@FieldName("map") Map map) {
+        return findNodeAll(map);
+    }
+
 
     @MethodDoc("高级找图")
     public FindImg.Rect findImg(@FieldName("png文件路径") String pngFile,
@@ -619,7 +741,12 @@ public abstract class JsDroidScript extends Script {
     @MethodDoc("读取配置")
     public String readConfig(@FieldName("key") String key,
                              @FieldName("默认值") String defaultValue) {
-        return getGApp().readConfig(key, defaultValue);
+        try {
+            return getGApp().readConfig(key, defaultValue);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return defaultValue;
     }
 
     @MethodDoc("读取配置")
@@ -809,4 +936,485 @@ public abstract class JsDroidScript extends Script {
         }
         return false;
     }
+
+    @MethodDoc("手机震动")
+    public void vibrate(int ms) {
+        try {
+            Vibrator vibrator =
+                    (Vibrator) getContext().getSystemService(Service.VIBRATOR_SERVICE);
+            vibrator.vibrate(ms);
+        } catch (Throwable e) {
+        }
+    }
+
+    @MethodDoc("播放音乐,返回音乐时长")
+    public int playMusic(@FieldName("file") String file) {
+
+        return SinglePlayer.play(file);
+
+    }
+
+    @MethodDoc("停止播放音乐")
+    public void stopMusic() {
+        SinglePlayer.stop();
+    }
+
+    @MethodDoc("get链")
+    public Http get(@FieldName("url") String url) {
+        return Http.get(url);
+    }
+
+    @MethodDoc("post链")
+    public Http post(@FieldName("url") String url) {
+        return Http.post(url);
+    }
+
+
+    public Context getContext() {
+        try {
+            return ContextUtil.getContext();
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+
+    @MethodDoc("点击节点")
+    public boolean click(@FieldName("map") Map map) throws InterruptedException {
+        try {
+            Node node = findNode(map);
+            if (node != null) {
+                node.click();
+                return true;
+            }
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
+    @MethodDoc("手势操作")
+    public void gestures(@FieldName("pointerGestures") PointerGesture... pointerGestures) {
+        try {
+            getGEvent().performGestures(pointerGestures);
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("输出日志")
+    public void log(@FieldName(value = "content", note = "输出的内容") Object content) {
+        print(content);
+    }
+
+    @MethodDoc("读取res文件")
+    public String readRes(String file) {
+        try {
+            return getGFile().readResToString(file);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @MethodDoc("读取res文件")
+    public String readRes(String file, String encode) {
+        try {
+            return getGFile().readResToString(file, encode);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @MethodDoc("读取res文件")
+    public byte[] readResBytes(String file) {
+        try {
+            return getGFile().readRes(file);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @MethodDoc("读取文件为字符串")
+    public String read(@FieldName("file") String file) {
+        try {
+            return new String(getGFile().readFile(file));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @MethodDoc("读取文件为字符串")
+    public String read(@FieldName("file") String file, @FieldName("encode") String encode) {
+        try {
+            return new String(getGFile().readFile(file), encode);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @MethodDoc("写入内容到文件")
+    public void write(@FieldName("file") String file,
+                      @FieldName("content") String content) {
+        try {
+            FileUtil.write(file, content);
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("向文件追加一行内容")
+    public void append(@FieldName("file") String file,
+                       @FieldName("content") String content) {
+        try {
+            FileUtil.append(file, content);
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("移动文件到文件")
+    public void moveFileToFile(@FieldName("from") String from,
+                               @FieldName("to") String to) {
+        try {
+            File fromFile = new File(from);
+            FileUtils.copyFile(fromFile,
+                    new File(to));
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("移动文件到文件夹")
+    public void moveFileToDir(@FieldName("from") String from,
+                              @FieldName("dir") String dir) {
+        try {
+            File fromFile = new File(from);
+            File toFile = new File(dir);
+            FileUtils.copyFileToDirectory(fromFile,
+                    toFile);
+            fromFile.delete();
+        } catch (Exception e) {
+        }
+
+    }
+
+    @MethodDoc("复制文件到文件")
+    public void copyFileToFile(@FieldName(value = "from") String from,
+                               @FieldName("to") String to) {
+        try {
+            FileUtils.copyFile(new File(from), new File(to));
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("复制文件到文件夹")
+    public void copyFileToDir(@FieldName("from") String from,
+                              @FieldName("dir") String dir) {
+        try {
+            FileUtils.copyFileToDirectory(new File(from), new File(dir));
+        } catch (Exception e) {
+        }
+
+    }
+
+    @MethodDoc("删除文件")
+    public void deleteFile(@FieldName(value = "file", note = "文件路径") String file) {
+        try {
+            new File(file).delete();
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("创建文件")
+    public void createFile(@FieldName(value = "file", note = "文件路径") String file) {
+        try {
+            new File(file).createNewFile();
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("创建文件夹")
+    public void mkdir(@FieldName(value = "dir", note = "文件路径") String file) {
+        try {
+            new File(file).mkdir();
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("创建文件夹，多层递归创建")
+    public void mkdirs(@FieldName(value = "dir", note = "文件路径") String file) {
+        try {
+            new File(file).mkdirs();
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     * 获取当前activity组件名
+     *
+     * @return
+     */
+    @MethodDoc("获取当前activity")
+    public String getActivity() {
+        try {
+            String result = exec("dumpsys activity activities|grep mResumedActivity");
+            String[] split = result.split(" ");
+            for (String sp : split) {
+                if (sp.contains("/")) {
+                    return sp;
+                }
+            }
+        } catch (Exception e) {
+        }
+        return "";
+    }
+
+    @MethodDoc("线程睡眠")
+    public void delay(@FieldName("time") long time) throws InterruptedException {
+        Thread.sleep(time);
+    }
+
+    @MethodDoc("锁定屏幕")
+    public void lockDevice() {
+        try {
+            ScreenUtil.lockDevice(getContext());
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     * 解锁屏幕
+     */
+    @MethodDoc("解锁屏幕")
+    public void unlockDevice() {
+        try {
+            ScreenUtil.unlockDevice(getContext());
+        } catch (Throwable e) {
+        }
+
+    }
+
+    @MethodDoc("启动activity")
+    public void startActivity(@FieldName("intent") Intent intent) {
+        try {
+            ActivityUtil.startActivity(intent);
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("获取屏幕宽度")
+    public int getScreenWidth() {
+        return ScreenUtil.getScreenWidth(getContext());
+    }
+
+    @MethodDoc("获取屏幕高度")
+    public int getScreenHeight() {
+        return ScreenUtil.getScreenHeight(getContext());
+    }
+
+    @MethodDoc("获取屏幕旋转方向")
+    public int getRotation() {
+        return ScreenUtil.getRotation();
+    }
+
+    @MethodDoc("获取屏幕未旋转的宽度")
+    public int getNaturalWidth() {
+        return ScreenUtil.getNaturalWidth();
+    }
+
+    @MethodDoc("获取屏幕未旋转的高度")
+    public int getNaturalHeight() {
+        return ScreenUtil.getNaturalHeight();
+    }
+
+    public Bitmap cap() {
+        try {
+            return Screens.getInstance().capture();
+        } catch (Throwable e) {
+        }
+        return null;
+    }
+
+    /**
+     * 截图
+     *
+     * @param file    保存的文件为准
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     * @param quality
+     * @param type    保存的类型：png/jpg
+     */
+    @MethodDoc("截屏到文件")
+    public void screenshot(@FieldName("saveFile") String file,
+                           @FieldName("left") int left,
+                           @FieldName("top") int top,
+                           @FieldName("right") int right,
+                           @FieldName("bottom") int bottom,
+                           @FieldName("quality") int quality,
+                           @FieldName("type") String type) {
+
+        FileOutputStream out = null;
+        try {
+            Bitmap bitmap = Screens.getInstance().capture();
+            Bitmap bitmap1 = Bitmap.createBitmap(bitmap,
+                    left,
+                    top,
+                    right - left,
+                    bottom - top);
+            out = new FileOutputStream(file);
+            bitmap1.compress(type.equals("png") ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG,
+                    quality,
+                    out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                out.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    /**
+     * 截图
+     *
+     * @param file
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     */
+    @MethodDoc("截屏到文件")
+    public void screenshot(@FieldName("file") String file,
+                           @FieldName("left") int left,
+                           @FieldName("top") int top,
+                           @FieldName("right") int right,
+                           @FieldName("bottom") int bottom) {
+        screenshot(file,
+                left,
+                top,
+                right,
+                bottom,
+                100);
+    }
+
+    /**
+     * 截图
+     *
+     * @param file
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     * @param quality
+     */
+    @MethodDoc("截屏到文件")
+    public void screenshot(@FieldName("file") String file,
+                           @FieldName("left") int left,
+                           @FieldName("top") int top,
+                           @FieldName("right") int right,
+                           @FieldName("bottom") int bottom,
+                           @FieldName("quality") int quality) {
+        screenshot(file,
+                left,
+                top,
+                right,
+                bottom,
+                quality,
+                "png");
+    }
+
+    @MethodDoc("读取图片")
+    public Bitmap readBitmap(@FieldName("file") String file) {
+        try {
+            byte[] data = FileUtil.readBytes(getGFile().openRes(file));
+            return BitmapFactory.decodeByteArray(data, 0, data.length);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @MethodDoc("保存图片")
+    public void saveBitmap(@FieldName("file") String file,
+                           @FieldName("bitmap") Bitmap image) {
+        try {
+            BitmapUtil.save(file,
+                    image);
+        } catch (Exception e) {
+        }
+    }
+
+    @MethodDoc("截屏")
+    public Bitmap cap(@FieldName("left") int left,
+                      @FieldName("top") int top,
+                      @FieldName("right") int right,
+                      @FieldName("bottom") int bottom) {
+        try {
+            Bitmap bitmap = cap();
+            return Bitmap.createBitmap(bitmap,
+                    left,
+                    top,
+                    right - left,
+                    bottom - top);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @MethodDoc("获取颜色的红色分量")
+    public int red(@FieldName("color") int color) {
+        return Color.red(color);
+    }
+
+    @MethodDoc("获取颜色的绿色分量")
+    public int green(@FieldName("color") int color) {
+        return Color.green(color);
+    }
+
+    @MethodDoc("获取颜色的蓝色分量")
+    public int blue(@FieldName("color") int color) {
+        return Color.blue(color);
+    }
+
+    @MethodDoc("获取颜色")
+    public int getColor(@FieldName("x") int x,
+                        @FieldName("y") int y) {
+        try {
+
+            return cap().getPixel(x,
+                    y);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    @MethodDoc("截取图片")
+    public Bitmap screenshot() {
+        try {
+            return cap();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @MethodDoc("执行groovy代码")
+    public Object eval(@FieldName("code") String code) throws Exception {
+        return Scripts.getInstance(pkg).eval(this, code);
+    }
+
+    @MethodDoc("执行groovy代码")
+    public Object runCode(@FieldName("code") String code) throws Exception {
+        return Scripts.getInstance(pkg).eval(this, code);
+    }
+
+
+    @MethodDoc("释放文件")
+    public void releaseFile(String resName, String path) {
+        try (
+                FileOutputStream out = new FileOutputStream(path);
+                InputStream input = files.openRes(resName)
+        ) {
+            IOUtils.copy(input, out);
+        } catch (Exception err) {
+
+        }
+    }
+
 }

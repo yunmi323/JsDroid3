@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
+import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 
 import com.jsdroid.api.annotations.Doc;
 import com.jsdroid.test.JsdApp;
@@ -17,11 +20,21 @@ import br.tiagohm.markdownview.MarkdownView;
 import br.tiagohm.markdownview.css.styles.Github;
 
 @Doc("脚本信息界面")
-public class ScriptInfoView extends LinearLayout {
+public class ScriptHelpView extends LinearLayout {
     private MarkdownView docView;
 
-    public ScriptInfoView(Context context) {
+    public ScriptHelpView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        init();
+
+    }
+
+    public ScriptHelpView(Context context) {
         super(context);
+        init();
+    }
+
+    private void init() {
         try {
             docView = new MarkdownView(getFixedContext(getContext()));
             addView(docView, new LayoutParams(-1, -1));
@@ -43,8 +56,13 @@ public class ScriptInfoView extends LinearLayout {
         if (docView == null) {
             return;
         }
-        JsdApp jsdApp = JsdApp.getInstance();
-        docView.loadMarkdownFromFile(new File(jsdApp.getScriptDir(), "readme.md"));
+        post(new Runnable() {
+            @Override
+            public void run() {
+                JsdApp jsdApp = JsdApp.getInstance();
+                docView.loadMarkdownFromFile(new File(jsdApp.getScriptDir(), "readme.md"));
+            }
+        });
     }
 
     public static Context getFixedContext(Context context) {

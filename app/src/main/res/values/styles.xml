@@ -8,13 +8,13 @@
         <item name="colorAccent">#64B5F6</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-
-
+        <item name="qmui_skin_support_topbar_bg">@color/primary</item>
+        <item name="qmui_skin_support_topbar_separator_color">@color/primary</item>
         <!-- New MaterialComponents attributes. -->
 
     </style>
 
-    <style name="Material" parent="Theme.MaterialComponents.Light.Bridge" >
+    <style name="Material" parent="Theme.MaterialComponents.Light.Bridge">
         <item name="colorPrimary">#2962FF</item>
         <item name="colorPrimaryDark">#0D47A1</item>
         <item name="colorAccent">#64B5F6</item>

@@ -1,14 +1,21 @@
 package com.jsdroid.sdk.nodes;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.UiAutomation;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import com.jsdroid.api.annotations.MethodDoc;
+import com.jsdroid.script.JsDroidScript;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import groovy.lang.Closure;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class Nodes {
@@ -23,6 +30,71 @@ public class Nodes {
     }
 
     private Nodes() {
+        init();
+    }
+
+    private void init() {
+        setFetchNotImportantNodeEnable(true);
+        setFetchWebNodeEnable(true);
+    }
+
+    public UiAutomation getUiAutomation() {
+        try {
+            Field uiAutomationField = UiAutomationService.class.getDeclaredField("uiAutomation");
+            uiAutomationField.setAccessible(true);
+            return (UiAutomation) uiAutomationField.get(UiAutomationService.getInstance());
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public void setFetchNotImportantNodeEnable(boolean enable) {
+        if (enable) {
+            addNodeFlag(AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS);
+        } else {
+            removeNodeFlag(AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS);
+        }
+    }
+
+    public void setFetchWebNodeEnable(boolean enable) {
+        if (enable) {
+            addNodeFlag(AccessibilityServiceInfo.FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY);
+        } else {
+            removeNodeFlag(AccessibilityServiceInfo.FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY);
+        }
+    }
+
+    /**
+     * @param flag
+     * @see AccessibilityServiceInfo#FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+     * @see AccessibilityServiceInfo#FLAG_REQUEST_TOUCH_EXPLORATION_MODE
+     * @see AccessibilityServiceInfo#FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY
+     * @see AccessibilityServiceInfo#FLAG_REQUEST_FILTER_KEY_EVENTS
+     * @see AccessibilityServiceInfo#FLAG_REPORT_VIEW_IDS
+     * @see AccessibilityServiceInfo#FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+     * @see AccessibilityServiceInfo#FLAG_ENABLE_ACCESSIBILITY_VOLUME
+     * @see AccessibilityServiceInfo#FLAG_REQUEST_ACCESSIBILITY_BUTTON
+     */
+    public void addNodeFlag(int flag) {
+        try {
+            UiAutomation uiAutomation = getUiAutomation();
+            assert uiAutomation != null;
+            AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
+            serviceInfo.flags |= flag;
+            uiAutomation.setServiceInfo(serviceInfo);
+        } catch (Throwable e) {
+        }
+    }
+
+    public void removeNodeFlag(int flag) {
+        try {
+            UiAutomation uiAutomation = getUiAutomation();
+            assert uiAutomation != null;
+            AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
+            serviceInfo.flags &= ~flag;
+            uiAutomation.setServiceInfo(serviceInfo);
+        } catch (Throwable e) {
+        }
     }
 
     public List<Node> getRootNodes() {
@@ -126,4 +198,57 @@ public class Nodes {
         return new NodeSearch().depth(depth);
     }
 
+    public NodeSearch map(Map map) {
+        NodeSearch ret = new NodeSearch();
+        if (map.containsKey("res")) {
+            Object res = map.get("res");
+            if (res instanceof Pattern) {
+                ret.res((Pattern) res);
+            } else {
+                ret.res(res.toString());
+            }
+        }
+        if (map.containsKey("text")) {
+            Object data = map.get("text");
+            if (data instanceof Pattern) {
+                ret.text((Pattern) data);
+            } else {
+                ret.text(data.toString());
+            }
+        }
+        if (map.containsKey("clazz")) {
+            Object data = map.get("clazz");
+            if (data instanceof Pattern) {
+                ret.clazz((Pattern) data);
+            } else {
+                ret.clazz(data.toString());
+            }
+        }
+        if (map.containsKey("desc")) {
+            Object data = map.get("desc");
+            if (data instanceof Pattern) {
+                ret.desc((Pattern) data);
+            } else {
+                ret.desc(data.toString());
+            }
+        }
+        if (map.containsKey("pkg")) {
+            Object data = map.get("pkg");
+            if (data instanceof Pattern) {
+                ret.pkg((Pattern) data);
+            } else {
+                ret.pkg(data.toString());
+            }
+        }
+
+        if (map.containsKey("depth")) {
+            ret.depth(Integer.parseInt((map.get("depth").toString())));
+        }
+        if (map.containsKey("index")) {
+            ret.index(Integer.parseInt((map.get("index").toString())));
+        }
+
+
+        return ret;
+    }
 }

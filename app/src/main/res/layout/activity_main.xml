@@ -14,30 +14,16 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolBar"
+            style="@style/ToolbarTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            style="@style/ToolbarTheme"
             app:titleTextColor="#fff" />
 
-        <LinearLayout
+        <com.jsdroid.test.widget.ScriptOptionView
+            android:id="@+id/optionView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#fff"
-            android:orientation="vertical">
-
-            <com.qmuiteam.qmui.widget.tab.QMUITabSegment
-                android:id="@+id/tabSegment"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                app:qmui_tab_has_indicator="true"
-                app:qmui_tab_indicator_height="2dp" />
-
-            <com.qmuiteam.qmui.widget.QMUIViewPager
-                android:id="@+id/tabPage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
+            android:layout_height="match_parent" />
     </LinearLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>

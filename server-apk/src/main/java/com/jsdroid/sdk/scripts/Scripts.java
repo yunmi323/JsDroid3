@@ -95,6 +95,20 @@ public class Scripts {
         return null;
     }
 
+    public Object eval(Script parent, String content) {
+        try {
+            Script script = createGroovyScriptFromCode(parent, content);
+            if (script != null) {
+                script.run();
+                return script;
+            }
+        } catch (Throwable e) {
+            Log.e("JsDroid", "eval: ",e );
+            return e;
+        }
+        return null;
+    }
+
     private void loadScript(Script parent, Script script) {
         if (parent != null) {
             Binding binding = parent.getBinding();
@@ -112,12 +126,16 @@ public class Scripts {
 
 
     public Script createGroovyScriptFromSource(String file) throws IOException {
+        return createGroovyScriptFromSource(null, file);
+    }
+
+    public Script createGroovyScriptFromSource(Script parent, String file) throws IOException {
         AndroidGroovyScriptLoader androidGroovyScriptLoader =
                 new AndroidGroovyScriptLoader(JsDroidEnv.optDir,
                         JsDroidEnv.classesDir,
                         JsDroidScript.class.getName());
         String source = FileUtils.readFileToString(new File(file));
-        Script script = androidGroovyScriptLoader.loadScript(null,
+        Script script = androidGroovyScriptLoader.loadScript(parent,
                 source, file);
         if (script != null) {
             script.setProperty("app", app);
@@ -126,12 +144,16 @@ public class Scripts {
     }
 
     public Script createGroovyScriptFromCode(String code) throws Exception {
+        return createGroovyScriptFromCode(null, code);
+    }
+
+    public Script createGroovyScriptFromCode(Script parent, String code) throws Exception {
         AndroidGroovyScriptLoader androidGroovyScriptLoader =
                 new AndroidGroovyScriptLoader(JsDroidEnv.optDir,
                         JsDroidEnv.classesDir,
                         JsDroidScript.class.getName());
-        Script script = androidGroovyScriptLoader.loadScript(null,
-                code, "script.groovy");
+        Script script = androidGroovyScriptLoader.loadScript(parent,
+                code, "script" + System.currentTimeMillis() + ".groovy");
         if (script != null) {
             script.setProperty("app", app);
         }

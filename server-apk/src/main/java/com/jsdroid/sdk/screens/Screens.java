@@ -1,7 +1,9 @@
 package com.jsdroid.sdk.screens;
 
+import android.app.UiAutomation;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
@@ -92,11 +94,11 @@ public class Screens {
                 } finally {
                     image.close();
                 }
-            }else{
-                Log.d("JsDroid", "readImage: image is null",new Exception());
+            } else {
+                Log.d("JsDroid", "readImage: image is null", new Exception());
             }
         } catch (Throwable e) {
-            Log.d("JsDroid", "readImage: ",e);
+            Log.d("JsDroid", "readImage: ", e);
         }
     }
 
@@ -115,7 +117,8 @@ public class Screens {
 
     private void getScreenSize() {
         int rotation = devices.getRotation();
-        if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+        if (rotation == UiAutomation.ROTATION_FREEZE_0
+                || rotation == UiAutomation.ROTATION_FREEZE_180) {
             screenWidth = devices.getNaturalWidth();
             screenHeight = devices.getNaturalHeight();
         } else {
@@ -152,7 +155,7 @@ public class Screens {
                 }
             }
         } catch (Exception e) {
-            Log.d("JsDroid", "checkImageReader: ",e);
+            Log.d("JsDroid", "checkImageReader: ", e);
         }
 
     }
@@ -171,9 +174,11 @@ public class Screens {
     }
 
     private ImageReader createImageReader() {
-        ImageReader imageReader = ImageReader.newInstance(screenWidth, screenHeight,0x1, 1);
+        ImageReader imageReader = ImageReader.newInstance(screenWidth, screenHeight, 0x1, 1);
+        Rect screenRect = new Rect(0, 0, screenWidth, screenHeight);
         SurfaceControls.openTransaction();
         SurfaceControls.setDisplaySurface(display, imageReader.getSurface());
+        SurfaceControls.setDisplayProjection(display, 0, screenRect, screenRect);
         SurfaceControls.setDisplayLayerStack(display, 0);
         SurfaceControls.closeTransaction();
         imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
@@ -183,7 +188,7 @@ public class Screens {
                     fireFrameUpdate();
                     checkImageReader();
                 } catch (Throwable e) {
-                    Log.d("JsDroid", "onImageAvailable: ",e);
+                    Log.d("JsDroid", "onImageAvailable: ", e);
                 }
             }
         }, new Handler(captureThread.getLooper()));

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 /**
  * 动态编译groovy文件的时候，需要将生成的class文件转换为dex文件
  */
-class DexBytecodeProcessor implements BytecodeProcessor {
+class DexBytecodeProcessor {
     private DexFile dexFile;
     private final DexOptions dexOptions;
     private final CfOptions cfOptions;
@@ -46,7 +46,6 @@ class DexBytecodeProcessor implements BytecodeProcessor {
         cfOptions.statistics = false;
     }
 
-    @Override
     public byte[] processBytecode(ClassNode classNode, byte[] bytes) {
         String pkgName = classNode.getPackageName();
         String className = classNode.getName();
@@ -79,4 +78,6 @@ class DexBytecodeProcessor implements BytecodeProcessor {
     public ArrayList<String> getClassNames() {
         return classNames;
     }
+
+
 }

@@ -23,6 +23,7 @@ import com.jsdroid.sdk.screens.Screens;
 import com.jsdroid.sdk.scripts.Scripts;
 import com.jsdroid.sdk.shells.Shells;
 import com.jsdroid.sdk.threads.SingleThread;
+import com.jsdroid.server_apk.BuildConfig;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
@@ -491,5 +492,10 @@ public class JsDroidShell implements IJsDroidShell {
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    @Override
+    public int versionCode() throws InterruptedException {
+        return BuildConfig.VERSION_CODE;
     }
 }
