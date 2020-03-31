@@ -1,22 +1,16 @@
 ### 欢迎使用JsDroid3.0！
 #### 介绍
 JsDroid3去除了JsDroid2多余的功能，追求以最简单化的方式开发最需要的功能。
+
+#### 下载
+[http://jsdroid.com#/download](http://jsdroid.com#/download)
+
 #### 文档(感谢痞老板贡献文档~)
-http://showdoc.jsdroid.com/web/#/20
-#### 软件下载
-- 电脑端
 
-   JsDroid: [http://oss.beijing.jsdroid.com/jsdroid3/jsdroid-qt-windows-x86.exe](http://oss.beijing.jsdroid.com/jsdroid3/jsdroid-qt-windows-x86.exe)
+官方文档：[http://jsdroid.com#/doc](http://jsdroid.com#/doc)
 
-   JSDK: [http://oss.beijing.jsdroid.com/jsdroid3/jsdk.exe](http://oss.beijing.jsdroid.com/jsdroid3/jsdk.exe)
+痞老板文档：[http://showdoc.jsdroid.com/web/#/20](http://showdoc.jsdroid.com/web/#/20)
 
-   IDEA: [https://download-cf.jetbrains.com/idea/ideaIC-2019.3.4.exe](https://download-cf.jetbrains.com/idea/ideaIC-2019.3.4.exe)
-
-- 手机端
-
-   JsDroid: [http://oss.beijing.jsdroid.com/jsdroid3/JsDroid3.0.apk](http://oss.beijing.jsdroid.com/jsdroid3/JsDroid3.0.apk)
-
-#### 软件截图
 
 #### 常用命令
 
