@@ -200,7 +200,7 @@ public class IFloatWindowImpl extends IFloatWindow {
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_OUTSIDE:
                                 if (mB.mViewStateListener != null) {
-                                    mB.mViewStateListener.onTouchOutside(IFloatWindowImpl.this);
+                                    mB.mViewStateListener.onTouchOutside(IFloatWindowImpl.this,event);
                                 }
                                 break;
                             case MotionEvent.ACTION_DOWN:
@@ -250,6 +250,7 @@ public class IFloatWindowImpl extends IFloatWindow {
                                                 }
                                             }
                                         });
+
                                         startAnimator();
                                         break;
                                     case MoveType.back:

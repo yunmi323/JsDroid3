@@ -62,18 +62,20 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly project(":ipc")
     compileOnly project(":api")
+    compileOnly files("sdk/sdk19-1.0.jar")
+    compileOnly(files("../libs/android.jar"))
+    compileOnly project(":app-hidden-api")
+    compileOnly "org.apache.commons:commons-io:1.3.2"
+    compileOnly "com.alibaba:fastjson:$FAST_JSON_VERSION"
+
     implementation project(":groovy")
     implementation(files("../libs/groovy.jar"))
 
     implementation 'com.google.android.tools:dx:1.7'
-    compileOnly files("sdk/sdk19-1.0.jar")
-    compileOnly(files("../libs/android.jar"))
-    implementation "org.apache.commons:commons-io:1.3.2"
     implementation "org.jsoup:jsoup:1.11.3"
     //server
     implementation 'com.koushikdutta.async:androidasync:2.+'
-    implementation "com.alibaba:fastjson:$FAST_JSON_VERSION"
-    implementation project(":app-hidden-api")
+
     implementation("eu.chainfire:libsuperuser:1.0.0.201811281328")
 //    implementation "commons-codec:commons-codec:1.14"
 

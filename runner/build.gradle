@@ -43,4 +43,5 @@ dependencies {
     implementation project(":ipc")
     implementation project(":api")
     implementation files("sdk/sdk.jar")
+    implementation "com.alibaba:fastjson:$FAST_JSON_VERSION"
 }

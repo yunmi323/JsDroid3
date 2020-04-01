@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
         menu.add("运行").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                FloatLogo.getInstance().show();
+                JsdApp.getInstance(JsdApp.class).showFloatMenu();
                 return false;
             }
         }).setIcon(R.drawable.ic_play).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
     protected void onDestroy() {
         super.onDestroy();
         UiMessageUtils.getInstance().removeListener(this);
+        optionView.onDestroy();
     }
 
     @Override

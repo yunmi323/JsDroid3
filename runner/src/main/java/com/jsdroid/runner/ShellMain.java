@@ -63,7 +63,7 @@ public class ShellMain {
 
             @Override
             public void onClose(Ipc.Server server) {
-                System.exit(0);
+                System.exit(1);
             }
 
             @Override
@@ -84,7 +84,7 @@ public class ShellMain {
         }
         //1.将apk文件里面的so解压出来
         //2.加载com.jsdroid.server.JsDroidServer
-       return new DexClassLoader(
+        return new DexClassLoader(
                 file,
                 JsDroidEnv.optDir,
                 JsDroidEnv.libDir,

@@ -25,7 +25,7 @@ public class Apps {
         return runnerApp;
     }
 
-    public static Apps getDefaultApp() {
+    public static Apps getDebugApp() {
         return getInstance("com.jsdroid.app");
     }
 
@@ -58,7 +58,7 @@ public class Apps {
     }
 
     public static void loadScript(String file) throws InterruptedException {
-        Apps defaultApp = getDefaultApp();
+        Apps defaultApp = getDebugApp();
         if (defaultApp != null) {
             new File(file).setExecutable(true, false);
             new File(file).setReadable(true, false);
@@ -69,7 +69,7 @@ public class Apps {
 
     public String readConfig(String key, String defaultValue) {
         if ("jsd.exe".equals(pkg)) {
-            Apps defaultApp = getDefaultApp();
+            Apps defaultApp = getDebugApp();
             if (defaultApp == null) {
                 return defaultValue;
             }
@@ -117,7 +117,7 @@ public class Apps {
             startAppService();
         }
         if ("jsd.exe".equals(pkg)) {
-            Apps defaultApp = getDefaultApp();
+            Apps defaultApp = getDebugApp();
             if (defaultApp != null) {
                 defaultApp.doPrint(text);
             }

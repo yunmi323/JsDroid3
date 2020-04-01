@@ -16,6 +16,7 @@
             <option value="$PROJECT_DIR$/app-hidden-api" />
             <option value="$PROJECT_DIR$/groovy" />
             <option value="$PROJECT_DIR$/ipc" />
+            <option value="$PROJECT_DIR$/pro" />
             <option value="$PROJECT_DIR$/runner" />
             <option value="$PROJECT_DIR$/server-apk" />
           </set>

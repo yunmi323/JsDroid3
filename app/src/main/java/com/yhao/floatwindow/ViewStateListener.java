@@ -1,5 +1,7 @@
 package com.yhao.floatwindow;
 
+import android.view.MotionEvent;
+
 /**
  * Created by yhao on 2018/5/5
  * https://github.com/yhaolpz
@@ -25,5 +27,5 @@ public interface ViewStateListener {
 
     void onTouchUp(IFloatWindow floatWindow);
 
-    void onTouchOutside(IFloatWindow floatWindow);
+    void onTouchOutside(IFloatWindow floatWindow, MotionEvent event);
 }

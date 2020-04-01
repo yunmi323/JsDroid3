@@ -8,7 +8,6 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.webkit.ConsoleMessage;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -23,7 +22,6 @@ import com.jsdroid.test.JsdApp;
 import com.jsdroid.test.R;
 import com.jsdroid.test.UiMessage;
 import com.just.agentweb.AgentWeb;
-import com.just.agentweb.WebChromeClient;
 import com.just.agentweb.WebViewClient;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -103,11 +101,12 @@ public class ScriptOptionView extends LinearLayout {
         }
     }
 
+
     private void showOptionHtml(File optionFile) {
         Context context = getContext();
         if (context instanceof Activity) {
 
-            AgentWeb.with((Activity) context).setAgentWebParent(this,
+            AgentWeb agentWeb = AgentWeb.with((Activity) context).setAgentWebParent(this,
                     new LayoutParams(-1, -1)
             ).useDefaultIndicator(getResources().getColor(R.color.primary))
                     .setWebChromeClient(new OptionChromeClient()).addJavascriptInterface("JsDroid", JsdApp.getInstance())
@@ -153,7 +152,13 @@ public class ScriptOptionView extends LinearLayout {
                             Log.d("JsDroid", "shouldOverrideUrlLoading: " + url);
                             return super.shouldOverrideUrlLoading(view, url);
                         }
-                    }).createAgentWeb().go("option://jsdroid.com/" + optionFile.getName());
+                    }).createAgentWeb().ready().get();
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    agentWeb.getUrlLoader().loadUrl("option://jsdroid.com/" + optionFile.getName());
+                }
+            });
 
         }
 
@@ -189,5 +194,8 @@ public class ScriptOptionView extends LinearLayout {
             }
         });
         contentView.addView(optionView);
+    }
+
+    public void onDestroy() {
     }
 }

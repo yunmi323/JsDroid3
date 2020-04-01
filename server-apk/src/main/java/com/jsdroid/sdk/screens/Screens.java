@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Surface;
 
 import com.jsdroid.app_hidden_api.SurfaceControls;
 import com.jsdroid.sdk.devices.Devices;
@@ -35,9 +34,8 @@ public class Screens {
     private int screenHeight;
     private IBinder display;
     private ImageReader imageReader;
+    private final Object readLock = new Object();
     private Bitmap cache;
-    private int cacheWidth;
-    private int cacheHeight;
     private HandlerThread captureThread;
     private Devices devices;
     private final List<FrameListener> frameListeners;
@@ -64,45 +62,48 @@ public class Screens {
 
     public Bitmap capture(float scale) throws InterruptedException {
         checkImageReader();
-        readImage();
-        synchronized (Screens.this) {
-            if (cache == null) {
-                Screens.this.wait(1000);
-                readImage();
-            }
-            if (cache != null) {
-                return scaleBitmap(cache, cacheWidth, cacheHeight, scale);
-            }
-            return null;
-        }
-    }
-
-    private void readImage() {
         try {
             Image image = imageReader.acquireLatestImage();
+            if (image == null && cache == null) {
+                synchronized (readLock) {
+                    readLock.wait(300);
+                }
+                image = imageReader.acquireLatestImage();
+            }
             if (image != null) {
+                Log.d("JsDroid", "capture: not null");
                 try {
-                    synchronized (Screens.this) {
-                        if (cache != null) {
-                            cache.recycle();
-                        }
-                        cacheWidth = image.getWidth();
-                        cacheHeight = image.getHeight();
-                        cache = readBitmap(image);
-                        Screens.this.notifyAll();
-                    }
+                    cache = readBitmap(image);
+                    cache = scaleBitmap(cache, screenWidth, screenHeight, 1.0f);
+                    Log.d("JsDroid", "capture: " + cache);
                 } finally {
                     image.close();
                 }
             } else {
-                Log.d("JsDroid", "readImage: image is null", new Exception());
+                Log.d("JsDroid", "capture: null");
             }
         } catch (Throwable e) {
-            Log.d("JsDroid", "readImage: ", e);
+            Log.d("JsDroid", "capture: ", e);
+            //异常，需要关闭并且再次创建image reader
+            closeImageReader();
         }
+        try {
+            if (scale == 1) {
+                return cache;
+            } else if (cache != null) {
+                return scaleBitmap(cache, cache.getWidth(), cache.getHeight(), scale);
+            }
+        } catch (Throwable e) {
+            Log.d("JsDroid", "capture: ", e);
+        }
+        return null;
     }
 
+
     private Bitmap readBitmap(Image image) {
+        if (image == null) {
+            return null;
+        }
         Image.Plane[] planes = image.getPlanes();
         Image.Plane plane = planes[0];
         int stride = plane.getPixelStride();
@@ -127,10 +128,11 @@ public class Screens {
         }
     }
 
-    private synchronized void fireFrameUpdate() {
-        synchronized (Screens.class) {
-            Screens.class.notifyAll();
+    private void fireFrameUpdate() {
+        synchronized (readLock) {
+            readLock.notifyAll();
         }
+        checkImageReader();
         try {
             for (FrameListener frameListener : frameListeners) {
                 frameListener.onFrameUpdate(Screens.this);
@@ -138,6 +140,14 @@ public class Screens {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void closeImageReader() {
+        if (imageReader != null) {
+            imageReader.close();
+            imageReader = null;
+        }
+        checkImageReader();
     }
 
     private synchronized void checkImageReader() {
@@ -174,7 +184,7 @@ public class Screens {
     }
 
     private ImageReader createImageReader() {
-        ImageReader imageReader = ImageReader.newInstance(screenWidth, screenHeight, 0x1, 1);
+        ImageReader imageReader = ImageReader.newInstance(screenWidth, screenHeight, 0x1, 3);
         Rect screenRect = new Rect(0, 0, screenWidth, screenHeight);
         SurfaceControls.openTransaction();
         SurfaceControls.setDisplaySurface(display, imageReader.getSurface());
@@ -184,17 +194,12 @@ public class Screens {
         imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader imageReader) {
-                try {
-                    fireFrameUpdate();
-                    checkImageReader();
-                } catch (Throwable e) {
-                    Log.d("JsDroid", "onImageAvailable: ", e);
-                }
+                fireFrameUpdate();
             }
         }, new Handler(captureThread.getLooper()));
+
         return imageReader;
     }
-
 
     private Bitmap scaleBitmap(Bitmap bitmap, int originWidth, int originHeight, float scale) {
         if (originWidth == 0 || originHeight == 0) {
@@ -207,4 +212,5 @@ public class Screens {
         matrix.postScale(scale, scale);
         return Bitmap.createBitmap(bitmap, 0, 0, originWidth, originHeight, matrix, false);
     }
+
 }

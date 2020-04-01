@@ -1,5 +1,7 @@
 package com.jsdroid.sdk.inputs;
 
+import android.util.Log;
+
 import com.jsdroid.app_hidden_api.InputUtil;
 import com.jsdroid.sdk.nodes.UiAutomationService;
 
@@ -22,16 +24,24 @@ public class Inputs {
     }
 
     public void openInputMethod() {
-        String ime_id = System.getenv("ime_id");
-        if (ime_id != null) {
-            InputUtil.setInputMethod(ime_id);
+        try {
+            String ime_id = System.getenv("ime_id");
+            if (ime_id != null) {
+                InputUtil.setInputMethod(ime_id);
+            }
+        } catch (Throwable e) {
+            Log.e("JsDroid", "openInputMethod: ", e);
         }
     }
 
 
     public void closeInputMethod() {
-        openInputMethod();
-        InputUtil.switchToLastInputMethod();
+        try {
+            openInputMethod();
+            InputUtil.switchToLastInputMethod();
+        } catch (Throwable e) {
+            Log.e("JsDroid", "openInputMethod: ", e);
+        }
     }
 
 

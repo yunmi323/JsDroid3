@@ -206,20 +206,23 @@ public class JsdApp extends JsDroidApplication {
 
     @JavascriptInterface
     public void showFloatMenu() {
+        Log.d("JsDroid", "showFloatMenu: ");
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                FloatLogo.getInstance().show();
+                switchFloatWindowState(true);
             }
         });
+
     }
 
     @JavascriptInterface
     public void hideFloatMenu() {
+        Log.d("JsDroid", "hideFloatMenu: ");
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                FloatLogo.getInstance().hide();
+                switchFloatWindowState(false);
             }
         });
     }

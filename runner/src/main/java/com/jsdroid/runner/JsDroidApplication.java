@@ -322,4 +322,12 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
         } catch (InterruptedException e) {
         }
     }
+
+    public int version() {
+        return BuildConfig.VERSION_CODE;
+    }
+
+    public String versionName() {
+        return BuildConfig.VERSION_NAME;
+    }
 }

@@ -1,5 +1,7 @@
 package com.yhao.floatwindow;
 
+import android.view.MotionEvent;
+
 /**
  * Created by yhao on 2018/5/5.
  * https://github.com/yhaolpz
@@ -57,7 +59,8 @@ public class ViewStateListenerAdapter implements ViewStateListener{
     }
 
     @Override
-    public void onTouchOutside(IFloatWindow floatWindow) {
+    public void onTouchOutside(IFloatWindow floatWindow, MotionEvent event) {
 
     }
+
 }

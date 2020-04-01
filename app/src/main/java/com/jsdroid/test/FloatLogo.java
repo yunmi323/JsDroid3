@@ -3,6 +3,8 @@ package com.jsdroid.test;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.os.Handler;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
@@ -46,6 +48,7 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
         FloatWindow.get().getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("JsDroid", "onClick: ");
                 if (large) {
                     if (running) {
                         stopScript();
@@ -89,6 +92,7 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
 
     public void onConfigureChanged() {
         show();
+        Log.d("JsDroid", "onConfigureChanged: ");
         showSmall(300);
     }
 
@@ -115,10 +119,12 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
         }
     }
 
+    //移动到边缘
     public synchronized void slideToSide(long time, boolean showLarge) {
         if (slideRunnable != null) {
             slideRunnable.cancel = true;
         }
+        Log.d("JsDroid", "showLarge: " + showLarge);
         slideRunnable = new SlideRunnable();
         slideRunnable.showLarge = showLarge;
         new Handler().postDelayed(slideRunnable, time);
@@ -185,6 +191,7 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
                             animatorY(startY, y, 200);
                             large = showLarge;
                             if (showLarge) {
+                                Log.d("JsDroid", "set alpha");
                                 view.setAlpha(1.0f);
                                 showSmall(3000);
                             } else {
@@ -252,13 +259,14 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
         }
 
         @Override
-        public void onTouchOutside(IFloatWindow floatWindow) {
+        public void onTouchOutside(IFloatWindow floatWindow, MotionEvent event) {
             showSmall(0);
         }
 
         @Override
         public void onMoveAnimEnd(IFloatWindow floatWindow) {
-            showSmall(3000);
+            showLarge(0);
+            Log.d("JsDroid", "onMoveAnimEnd: ");
         }
 
         @Override
@@ -280,7 +288,6 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
     boolean large;
 
     private void showLarge(int delay) {
-
         slideToSide(delay, true);
     }
 
