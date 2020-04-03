@@ -38,11 +38,13 @@ public class JsDroidService implements IJsDroidService {
                 JsDroidShell jsDroidShell = appMap.get(pkg);
                 jsDroidShell.setApp(app);
                 jsDroidShell.setServiceProxy(serviceProxy);
+                Apps.getInstance(pkg).setShell(jsDroidShell);
                 return jsDroidShell;
             } else {
                 JsDroidShell jsDroidShell = createJsDroidShell(app);
                 jsDroidShell.setServiceProxy(serviceProxy);
                 appMap.put(pkg, jsDroidShell);
+                Apps.getInstance(pkg).setShell(jsDroidShell);
                 return jsDroidShell;
             }
         } catch (Exception e) {

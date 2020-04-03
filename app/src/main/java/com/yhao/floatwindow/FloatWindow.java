@@ -62,6 +62,8 @@ public class FloatWindow {
         int gravity = Gravity.TOP | Gravity.START;
         int xOffset;
         int yOffset;
+        Integer mWindowFlags;
+        Integer mWindowType;
         boolean mShow = true;
         Class[] mActivities;
         int mMoveType = MoveType.slide;
@@ -73,6 +75,7 @@ public class FloatWindow {
         boolean mDesktopShow;
         PermissionListener mPermissionListener;
         ViewStateListener mViewStateListener;
+
 
         private B() {
 
@@ -139,6 +142,16 @@ public class FloatWindow {
             yOffset = (int) ((screenType == Screen.width ?
                     Util.getScreenWidth(mApplicationContext) :
                     Util.getScreenHeight(mApplicationContext)) * ratio);
+            return this;
+        }
+
+        public B setWindowFlag(int windowFlag) {
+            this.mWindowFlags = windowFlag;
+            return this;
+        }
+
+        public B setWindType(int type) {
+            this.mWindowType = type;
             return this;
         }
 

@@ -10,7 +10,9 @@ android {
             applicationId "com.jsdroid.test"
         } else {
             applicationId "com.jsdroid.app"
+
         }
+
         minSdkVersion 19
         targetSdkVersion 28
         versionCode JSDROID_VERSION_CODE
@@ -22,12 +24,12 @@ android {
             abiFilters 'armeabi-v7a', 'x86'//'armeabi' ,'armeabi-v7a',  'arm64-v8a'
         }
         vectorDrawables.useSupportLibrary = true
-        println"output:"
+        println "output:"
         println buildOutputs.size()
         buildOutputs.each {
-            v->
+            v ->
                 println v
-                println"h"
+                println "h"
         }
     }
 
@@ -41,6 +43,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -64,3 +69,27 @@ dependencies {
     implementation 'com.just.agentweb:agentweb:4.1.3'
 
 }
+
+build.doLast {
+
+    if (BUILD_TEMPLATE) {
+        println "build template"
+        //将build之后的apk复制到runner/src/main/res/raw/server.apk
+        project.buildOutputs.forEach({
+            v ->
+                if (v.name == "release") {
+                    copy {
+                        from(v.outputFile)
+                        into(new File("release"))
+                        rename {
+                            oldName ->
+                                "template.apk"
+                        }
+                    }
+                }
+
+        })
+    }
+
+}
+

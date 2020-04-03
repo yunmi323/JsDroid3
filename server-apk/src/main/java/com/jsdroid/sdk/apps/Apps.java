@@ -3,6 +3,7 @@ package com.jsdroid.sdk.apps;
 import com.jsdroid.api.IInput;
 import com.jsdroid.api.IJsDroidApp;
 import com.jsdroid.commons.ShellUtil;
+import com.jsdroid.server.JsDroidShell;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,6 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Apps {
+    //电脑jsd命令
+    public static final String JSD_APP = "jsd.exe";
+    public static final String DEBUG_APP = "com.jsdroid.app";
     private static Map<String, Apps> instanceMap = new HashMap<>();
 
     private static Apps runnerApp;
@@ -26,7 +30,7 @@ public class Apps {
     }
 
     public static Apps getDebugApp() {
-        return getInstance("com.jsdroid.app");
+        return getInstance(DEBUG_APP);
     }
 
     public synchronized static void putApp(String pkg, IJsDroidApp app) {
@@ -47,10 +51,19 @@ public class Apps {
     private String pkg;
     private IJsDroidApp app;
     private boolean isRunnerApp;
+    private JsDroidShell shell;
 
     public Apps(String pkg, IJsDroidApp app) {
         this.pkg = pkg;
         this.app = app;
+    }
+
+    public JsDroidShell getShell() {
+        return shell;
+    }
+
+    public void setShell(JsDroidShell shell) {
+        this.shell = shell;
     }
 
     public String getPkg() {
@@ -68,7 +81,7 @@ public class Apps {
     }
 
     public String readConfig(String key, String defaultValue) {
-        if ("jsd.exe".equals(pkg)) {
+        if (Apps.JSD_APP.equals(pkg)) {
             Apps defaultApp = getDebugApp();
             if (defaultApp == null) {
                 return defaultValue;
@@ -116,7 +129,7 @@ public class Apps {
         } catch (Exception e) {
             startAppService();
         }
-        if ("jsd.exe".equals(pkg)) {
+        if (Apps.JSD_APP.equals(pkg)) {
             Apps defaultApp = getDebugApp();
             if (defaultApp != null) {
                 defaultApp.doPrint(text);

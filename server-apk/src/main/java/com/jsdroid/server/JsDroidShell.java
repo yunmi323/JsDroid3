@@ -79,7 +79,7 @@ public class JsDroidShell implements IJsDroidShell {
         this.app = app;
         this.pkg = app.getPackage();
         if (running) {
-            if ("jsd.exe".equals(pkg)) {
+            if (Apps.JSD_APP.equals(pkg)) {
                 Apps.getRunnerApp().getApp().onScriptStart();
             } else {
                 app.onScriptStart();
@@ -96,6 +96,7 @@ public class JsDroidShell implements IJsDroidShell {
                     @Override
                     public void run() {
                         try {
+
                             app.onVolumeDown(running);
                         } catch (InterruptedException e) {
                         }
@@ -166,7 +167,7 @@ public class JsDroidShell implements IJsDroidShell {
                 Inputs.getInstance().onScriptStart(pkg);
 
                 try {
-                    if ("jsd.exe".equals(pkg)) {
+                    if (Apps.JSD_APP.equals(pkg)) {
                         Apps.getRunnerApp().getApp().onScriptStart();
                     } else {
                         app.onScriptStart();
@@ -247,7 +248,7 @@ public class JsDroidShell implements IJsDroidShell {
             @Override
             public void run() {
                 try {
-                    if ("jsd.exe".equals(pkg)) {
+                    if (Apps.JSD_APP.equals(pkg)) {
                         Apps.loadScript(file);
                     }
                     Scripts.getInstance(pkg).setApp(app);
@@ -287,6 +288,15 @@ public class JsDroidShell implements IJsDroidShell {
                 onScriptStop();
             }
         }
+        try {
+            if (Apps.JSD_APP.equals(pkg)) {
+                Apps debugApp = Apps.getDebugApp();
+                if (debugApp != null) {
+                    debugApp.getShell().setRunning(running);
+                }
+            }
+        } catch (Exception e) {
+        }
     }
 
     private void sendScriptStop(final Object out) {
@@ -302,7 +312,7 @@ public class JsDroidShell implements IJsDroidShell {
                 } catch (Exception ex) {
                 }
                 try {
-                    if ("jsd.exe".equals(pkg)) {
+                    if (Apps.JSD_APP.equals(pkg)) {
                         if (out == null) {
                             Apps.getRunnerApp().getApp().onScriptStop(null);
                         } else {

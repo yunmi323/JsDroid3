@@ -3,6 +3,7 @@ package com.jsdroid.sdk.screens;
 import android.app.UiAutomation;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.media.Image;
 import android.media.ImageReader;
@@ -39,6 +40,7 @@ public class Screens {
     private HandlerThread captureThread;
     private Devices devices;
     private final List<FrameListener> frameListeners;
+    private boolean readOk;//格式是否正确
 
     private Screens() {
         frameListeners = new ArrayList<>();
@@ -59,28 +61,64 @@ public class Screens {
         return capture(1);
     }
 
+    private int imageFormat = -1;
 
-    public Bitmap capture(float scale) throws InterruptedException {
-        checkImageReader();
+    //首次截图需要判断格式是否正确
+    private void getFrameFormatOnFirst() {
+        // Image image = imageReader.acquireLatestImage();
+        //The producer output buffer format 0x2 doesn't match the ImageReader's configured buffer format 0x1.
+        if (readOk) {
+            return;
+        }
         try {
             Image image = imageReader.acquireLatestImage();
-            if (image == null && cache == null) {
-                synchronized (readLock) {
-                    readLock.wait(300);
-                }
-                image = imageReader.acquireLatestImage();
-            }
+            readOk = true;
             if (image != null) {
-                Log.d("JsDroid", "capture: not null");
                 try {
                     cache = readBitmap(image);
                     cache = scaleBitmap(cache, screenWidth, screenHeight, 1.0f);
-                    Log.d("JsDroid", "capture: " + cache);
+                } catch (Exception ignore) {
                 } finally {
                     image.close();
                 }
-            } else {
-                Log.d("JsDroid", "capture: null");
+            }
+        } catch (Exception e) {
+            String message = e.getMessage();
+            if (message != null) {
+                if (message.startsWith("The producer output buffer format")) {
+                    String[] arr = message.split(" ");
+                    for (String a : arr) {
+                        if (a.startsWith("0x")) {
+                            try {
+                                this.imageFormat = Integer.parseInt(a.substring(2), 16);
+                                readOk = true;
+                                closeImageReader();
+                                return;
+                            } catch (NumberFormatException ex) {
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public Bitmap capture(float scale) throws InterruptedException {
+        checkImageReader();
+        if (!readOk) {
+            synchronized (readLock) {
+                readLock.wait(1000);
+            }
+        }
+        try {
+            Image image = imageReader.acquireLatestImage();
+            if (image != null) {
+                try {
+                    cache = readBitmap(image);
+                    cache = scaleBitmap(cache, screenWidth, screenHeight, 1.0f);
+                } finally {
+                    image.close();
+                }
             }
         } catch (Throwable e) {
             Log.d("JsDroid", "capture: ", e);
@@ -129,6 +167,7 @@ public class Screens {
     }
 
     private void fireFrameUpdate() {
+        getFrameFormatOnFirst();
         synchronized (readLock) {
             readLock.notifyAll();
         }
@@ -183,8 +222,9 @@ public class Screens {
         frameListeners.remove(frameListener);
     }
 
+
     private ImageReader createImageReader() {
-        ImageReader imageReader = ImageReader.newInstance(screenWidth, screenHeight, 0x1, 3);
+        ImageReader imageReader = ImageReader.newInstance(screenWidth, screenHeight, imageFormat == -1 ? PixelFormat.RGBA_8888 : imageFormat, 3);
         Rect screenRect = new Rect(0, 0, screenWidth, screenHeight);
         SurfaceControls.openTransaction();
         SurfaceControls.setDisplaySurface(display, imageReader.getSurface());

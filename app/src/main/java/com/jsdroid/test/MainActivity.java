@@ -5,16 +5,20 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.blankj.utilcode.util.UiMessageUtils;
+import com.jsdroid.runner.JsDroidApplication;
 import com.jsdroid.test.widget.ScriptOptionView;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -26,6 +30,8 @@ import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.yhao.floatwindow.SdkVersion;
 
 public class MainActivity extends AppCompatActivity implements UiMessageUtils.UiMessageCallback {
@@ -34,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
     private AccountHeader accountHeader;
     private Drawer drawer;
     private ScriptOptionView optionView;
+    boolean pro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
                 .withHeaderDivider(true)
                 .withAccountHeader(accountHeader, true)
                 .withToolbar(toolBar)
+                .withActionBarDrawerToggleAnimated(true)
                 .build();
         drawer.getActionBarDrawerToggle().getDrawerArrowDrawable().setColor(0xffffffff);
         JsdApp jsdApp = JsdApp.getInstance(JsdApp.class);
@@ -84,14 +92,54 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
                 jsdApp.switchVolumeControlState(isChecked);
             }
         }));
-        drawer.addItem(new PrimaryDrawerItem().withIdentifier(3).withName("重启服务").withSelectable(false).withIsExpanded(true).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-            @Override
-            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                JsdApp jsdApp = JsdApp.getInstance();
-                jsdApp.stopScript();
-                return false;
-            }
-        }));
+        drawer.addItem(new PrimaryDrawerItem().withIdentifier(3).withName("重启服务")
+                .withSelectable(false).withIsExpanded(true).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        JsdApp jsdApp = JsdApp.getInstance();
+                        jsdApp.stopScript();
+                        return false;
+                    }
+                }));
+
+        if (pro) {
+            drawer.addItem(new PrimaryDrawerItem().withIdentifier(4).withName("自定义su").withSelectable(false)
+                    .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                        @Override
+                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                            QMUIDialog.EditTextDialogBuilder editTextDialogBuilder = new QMUIDialog.EditTextDialogBuilder(MainActivity.this);
+                            editTextDialogBuilder.setDefaultText(JsDroidApplication.getInstance().getSu());
+                            editTextDialogBuilder.setPlaceholder("请输入自定义su");
+                            editTextDialogBuilder.setTitle("请输入自定义su");
+                            editTextDialogBuilder.addAction("取消", new QMUIDialogAction.ActionListener() {
+                                @Override
+                                public void onClick(QMUIDialog dialog, int index) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            editTextDialogBuilder.addAction("确定", new QMUIDialogAction.ActionListener() {
+                                @Override
+                                public void onClick(QMUIDialog dialog, int index) {
+                                    dialog.dismiss();
+                                    EditText editText = editTextDialogBuilder.getEditText();
+                                    String su = editText.getText().toString();
+                                    String trim = su.trim();
+                                    if (trim.length() > 0) {
+                                        JsDroidApplication.getInstance().setSu(trim);
+                                    }
+
+                                }
+                            });
+
+                            QMUIDialog qmuiDialog = editTextDialogBuilder.create();
+                            qmuiDialog.show();
+
+
+                            return false;
+                        }
+                    })
+            );
+        }
 
     }
 

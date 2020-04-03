@@ -7,11 +7,10 @@ import android.animation.PropertyValuesHolder;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.os.Build;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 
 /**
@@ -44,6 +43,12 @@ public class IFloatWindowImpl extends IFloatWindow {
     IFloatWindowImpl(FloatWindow.B b) {
         mB = b;
         mFloatView = new FloatPhone(b.mApplicationContext, mB.mPermissionListener);
+        if (b.mWindowFlags != null) {
+            mFloatView.getLayoutParams().flags = b.mWindowFlags;
+        }
+        if (b.mWindowType != null) {
+            mFloatView.getLayoutParams().type = b.mWindowType;
+        }
         initTouchEvent();
         mFloatView.setSize(mB.mWidth, mB.mHeight);
         mFloatView.setGravity(mB.gravity, mB.xOffset, mB.yOffset);
@@ -127,6 +132,21 @@ public class IFloatWindowImpl extends IFloatWindow {
     }
 
     @Override
+    public FloatView getFloatView() {
+        return mFloatView;
+    }
+
+    @Override
+    public WindowManager.LayoutParams getParams() {
+        return mFloatView.getLayoutParams();
+    }
+
+    @Override
+    public void updateParams() {
+        mFloatView.updateLayoutParams();
+    }
+
+    @Override
     public void updateX(int x) {
         checkMoveType();
         mB.xOffset = x;
@@ -200,7 +220,7 @@ public class IFloatWindowImpl extends IFloatWindow {
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_OUTSIDE:
                                 if (mB.mViewStateListener != null) {
-                                    mB.mViewStateListener.onTouchOutside(IFloatWindowImpl.this,event);
+                                    mB.mViewStateListener.onTouchOutside(IFloatWindowImpl.this, event);
                                 }
                                 break;
                             case MotionEvent.ACTION_DOWN:

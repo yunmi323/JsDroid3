@@ -1,6 +1,6 @@
 package com.jsdroid.test;
 
-import android.util.Log;
+import android.animation.Animator;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.UiMessageUtils;
 import com.jsdroid.test.widget.ScriptOptionView;
+import com.jsdroid.test.widget.ShadowDrawable;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.IFloatWindow;
@@ -60,13 +61,23 @@ public class FloatMenu implements UiMessageUtils.UiMessageCallback {
                 .setTag(TAG)
                 .setMoveType(MoveType.inactive)
                 .setView(R.layout.jsd_float_menu)
+                .setWindowFlag(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
                 .setDesktopShow(true)
                 .setViewStateListener(new ViewStateListenerAdapter() {
                     @Override
                     public void onShow(final IFloatWindow floatWindow) {
-                        floatWindow.removeWindowFlag(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+                        WindowManager.LayoutParams params = floatWindow.getParams();
+//                        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+                        params.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN;
+                        floatWindow.updateParams();
+                        View view = floatWindow.getView();
+                        view.setAlpha(0);
+                        view.animate().setDuration(300).alpha(1).start();
                         toCenter(floatWindow);
+
                     }
+
+
                 })
                 .build();
         IFloatWindow floatWindow = FloatWindow.get(TAG);
@@ -74,9 +85,31 @@ public class FloatMenu implements UiMessageUtils.UiMessageCallback {
             view = floatWindow.getView();
             view.findViewById(R.id.btnClose).setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
-                    hide();
-                    FloatLogo.getInstance().show();
+                public void onClick(View v) {
+                    view.animate().setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+                            hide();
+                            FloatLogo.getInstance().show();
+                            view.animate().setListener(null);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+
+                        }
+                    }).alpha(0).setDuration(300).start();
+
                 }
             });
             view.findViewById(R.id.btnRun).setOnClickListener(new View.OnClickListener() {
@@ -85,6 +118,16 @@ public class FloatMenu implements UiMessageUtils.UiMessageCallback {
                     jsdApp.startScript();
                 }
             });
+            int dp4 = QMUIDisplayHelper.dp2px(view.getContext(), 8);
+            ShadowDrawable drawable = new ShadowDrawable.Builder()
+                    .setShapeRadius(dp4)
+                    .setShadowColor(0xff333333)
+                    .setShadowRadius(dp4)
+                    .setBgColor(0xffffffff)
+                    .builder();
+            drawable.setAlpha(100);
+            view.findViewById(R.id.rootView).setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            view.findViewById(R.id.rootView).setBackground(drawable);
             scriptOptionView = new ScriptOptionView(view.getContext());
             LinearLayout content = view.findViewById(R.id.content);
             content.addView(scriptOptionView);
@@ -97,9 +140,7 @@ public class FloatMenu implements UiMessageUtils.UiMessageCallback {
     public void show() {
         final IFloatWindow floatWindow = FloatWindow.get(TAG);
         if (floatWindow != null) {
-            Log.d(TAG, "show: ");
             floatWindow.show();
-//            floatWindow.removeWindowFlag(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
             toCenter(floatWindow);
         } else {
             initView();
@@ -131,7 +172,6 @@ public class FloatMenu implements UiMessageUtils.UiMessageCallback {
                 public void run() {
                     IFloatWindow floatWindow = FloatWindow.get(TAG);
                     if (floatWindow != null) {
-                        floatWindow.addWindowFlag(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
                         floatWindow.hide();
                     }
                 }

@@ -3,6 +3,7 @@ package com.jsdroid.script;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.ActivityThread;
 import android.app.Application;
+import android.app.Notification;
 import android.app.Service;
 import android.app.UiAutomation;
 import android.content.ComponentName;
@@ -15,11 +16,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
+import android.view.accessibility.AccessibilityEvent;
 
 import com.genymobile.scrcpy.wrappers.ServiceManager;
 import com.genymobile.scrcpy.wrappers.SurfaceControl;
+import com.google.android.collect.Maps;
 import com.jsdroid.api.IInput;
 import com.jsdroid.api.IJsDroidApp;
 import com.jsdroid.api.annotations.FieldName;
@@ -54,6 +58,8 @@ import com.jsdroid.sdk.screens.Screens;
 import com.jsdroid.sdk.scripts.Scripts;
 import com.jsdroid.sdk.shells.Shells;
 import com.jsdroid.sdk.sockets.Sockets;
+import com.jsdroid.uiautomator2.SearchCondition;
+import com.jsdroid.uiautomator2.UiDevice;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -65,14 +71,19 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
 import groovy.lang.Binding;
 import groovy.lang.Closure;
 import groovy.lang.Script;
+
+import static java.lang.Thread.sleep;
 
 public abstract class JsDroidScript extends Script {
     public IJsDroidApp app;
@@ -1166,7 +1177,7 @@ public abstract class JsDroidScript extends Script {
 
     @MethodDoc("线程睡眠")
     public void delay(@FieldName("time") long time) throws InterruptedException {
-        Thread.sleep(time);
+        sleep(time);
     }
 
     @MethodDoc("锁定屏幕")
@@ -1406,7 +1417,7 @@ public abstract class JsDroidScript extends Script {
 
 
     @MethodDoc("释放文件")
-    public void releaseFile(String resName, String path) {
+    public void releaseFile(@FieldName("resName") String resName, @FieldName("path") String path) {
         try (
                 FileOutputStream out = new FileOutputStream(path);
                 InputStream input = files.openRes(resName)
@@ -1415,6 +1426,119 @@ public abstract class JsDroidScript extends Script {
         } catch (Exception err) {
 
         }
+    }
+
+    @MethodDoc("等待节点")
+    public Node waitNode(Map map, int waitCount, int sleepTime) throws InterruptedException {
+        for (int i = 0; i < waitCount; i++) {
+            Node node = findNode(map);
+            if (node != null) {
+                return node;
+            } else {
+                sleep(sleepTime);
+            }
+        }
+        return null;
+    }
+
+    @MethodDoc("点击节点(如果存在)")
+    public Node clickNode(Map map, int waitCount, int sleepTime) throws InterruptedException {
+        Node node = waitNode(map, waitCount, sleepTime);
+        if (node != null) {
+            node.click();
+        }
+        return node;
+    }
+
+    @MethodDoc("点击节点(如果存在某个值)")
+    public Node clickValue(String key, Object value, int waitCount, int sleepTime) throws InterruptedException {
+        Map map = new HashMap<>();
+        map.put(key, value);
+        return clickNode(map, waitCount, sleepTime);
+    }
+
+
+    @MethodDoc("点击节点(如果存在文字)")
+    public Node clickText(Object text, int waitCount, int sleepTime) throws InterruptedException {
+        return clickValue("text", text, waitCount, sleepTime);
+    }
+
+    @MethodDoc("点击节点(如果存在res)")
+    public Node clickRes(Object res, int waitCount, int sleepTime) throws InterruptedException {
+        return clickValue("res", res, waitCount, sleepTime);
+    }
+
+    @MethodDoc("点击节点(如果存在desc)")
+    public Node clickDesc(Object desc, int waitCount, int sleepTime) throws InterruptedException {
+        return clickValue("desc", desc, waitCount, sleepTime);
+    }
+
+    @MethodDoc("等待activity出现")
+    public boolean waitActivity(String activityName, int waitCount, int sleepTime) throws InterruptedException {
+        for (int i = 0; i < waitCount; i++) {
+            String activity = getActivity();
+            if (activity.contains(activityName)) {
+                return true;
+            } else {
+                sleep(sleepTime);
+            }
+        }
+        return false;
+    }
+
+    @MethodDoc("启动activity,并且等待他出现")
+    public boolean startAndWaitActivity(String activityName, int waitCount, int sleepTime) throws InterruptedException {
+        startActivity(activityName);
+        return waitActivity(activityName, waitCount, sleepTime);
+    }
+
+    @MethodDoc("启动activity")
+    public void startActivity(String activityName) {
+        exec("am start -n " + activityName);
+    }
+
+    @MethodDoc("遍历节点")
+    public void eachNode(Node.NodeEach each) {
+        nodes.eachNode(each);
+    }
+
+    @MethodDoc("等待应用出现通知或者Toast消息")
+    public String waitNotification(String pkg, int timeout) throws TimeoutException {
+        AccessibilityEvent event = getUiAutomation().executeAndWaitForEvent(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        }, new UiAutomation.AccessibilityEventFilter() {
+            @Override
+            public boolean accept(AccessibilityEvent event) {
+                int type = event.getEventType();
+                if (type == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
+                    if (event.getPackageName().equals(pkg)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }, timeout);
+        if (event != null) {
+            List<CharSequence> text = event.getText();
+            if (text != null) {
+                StringBuilder sb = new StringBuilder();
+                Iterator<CharSequence> iterator = text.iterator();
+                while (iterator.hasNext()) {
+                    CharSequence ch = iterator.next();
+                    if (ch != null) {
+                        sb.append(ch);
+                        if (iterator.hasNext()) {
+                            sb.append("\n");
+                        }
+                    }
+                }
+                return sb.toString();
+            }
+        }
+        return null;
     }
 
 }

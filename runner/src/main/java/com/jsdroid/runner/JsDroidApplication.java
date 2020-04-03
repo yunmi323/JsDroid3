@@ -131,6 +131,22 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
         return sharedPreferences.getString(key, defaultValue);
     }
 
+    public void setSu(String su) {
+        saveConfig("shell.su", su);
+        //更新su命令后重启服务
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                jsDroidDaemonThread.startServer();
+            }
+        }).start();
+
+    }
+
+    public String getSu() {
+        return readConfig("shell.su", "su");
+    }
+
     @JavascriptInterface
     public void saveConfig(String key, String value) {
         SharedPreferences sharedPreferences = getSharedPreferences(getPackageName(), 0);

@@ -11,7 +11,7 @@ import android.view.WindowManager;
  * https://github.com/yhaolpz
  */
 
-class FloatPhone extends FloatView {
+public class FloatPhone extends FloatView {
 
     private final Context mContext;
 
@@ -129,7 +129,7 @@ class FloatPhone extends FloatView {
     }
 
     @Override
-    void updateX(int x) {
+    public void updateX(int x) {
         if (isRemove) return;
         mLayoutParams.x = mX = x;
         try {
@@ -139,7 +139,7 @@ class FloatPhone extends FloatView {
     }
 
     @Override
-    void updateY(int y) {
+    public void updateY(int y) {
         if (isRemove) return;
         mLayoutParams.y = mY = y;
         try {
@@ -149,17 +149,17 @@ class FloatPhone extends FloatView {
     }
 
     @Override
-    int getX() {
+    public int getX() {
         return mX;
     }
 
     @Override
-    int getY() {
+    public int getY() {
         return mY;
     }
 
     @Override
-    void addWindowFlag(int flag) {
+    public void addWindowFlag(int flag) {
         if (isRemove) return;
         mLayoutParams.flags = mLayoutParams.flags | flag;
         try {
@@ -170,10 +170,26 @@ class FloatPhone extends FloatView {
     }
 
     @Override
-    void removeWindowFlag(int flag) {
+    public void removeWindowFlag(int flag) {
         if (isRemove) return;
         try {
             mLayoutParams.flags = mLayoutParams.flags & (~flag);
+        } catch (Exception e) {
+        }
+    }
+
+    @Override
+    public WindowManager.LayoutParams getLayoutParams() {
+        return mLayoutParams;
+    }
+
+    @Override
+    public void updateLayoutParams() {
+        if (isRemove) {
+            return;
+        }
+        try {
+            mWindowManager.updateViewLayout(mView, mLayoutParams);
         } catch (Exception e) {
         }
     }

@@ -20,6 +20,8 @@ public class SimpleSu {
 
     private static final Object LOCK = new Object();
 
+    public static String su = "su";
+
     private SimpleSu() {
 
     }
@@ -34,11 +36,12 @@ public class SimpleSu {
         }
     }
 
+
     private static String exec(String command, boolean output) {
         d("[command] " + command);
         StringWriter sw = new StringWriter();
         try {
-            Process process = Runtime.getRuntime().exec("su");
+            Process process = Runtime.getRuntime().exec(su);
             Thread out = null;
             Thread err = null;
             if (output) {
@@ -90,7 +93,7 @@ public class SimpleSu {
 
         private static boolean checkSu() {
             for (String dir : System.getenv("PATH").split(":")) {
-                File path = new File(dir, "su");
+                File path = new File(dir, su);
                 try {
                     //Os.access(path.getPath(), 1)
                     if (path.exists()) {

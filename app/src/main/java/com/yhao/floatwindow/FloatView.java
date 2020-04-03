@@ -1,41 +1,47 @@
 package com.yhao.floatwindow;
 
 import android.view.View;
+import android.view.WindowManager;
 
 /**
  * Created by yhao on 17-11-14.
  * https://github.com/yhaolpz
  */
 
-abstract class FloatView {
+public abstract class FloatView {
 
-    abstract void setSize(int width, int height);
+    public abstract void setSize(int width, int height);
 
-    abstract void setView(View view);
+    public abstract void setView(View view);
 
-    abstract void setGravity(int gravity, int xOffset, int yOffset);
+    public abstract void setGravity(int gravity, int xOffset, int yOffset);
 
-    abstract void init();
+    public abstract void init();
 
-    abstract void dismiss();
+    public abstract void dismiss();
 
-    void updateXY(int x, int y) {
+    public void updateXY(int x, int y) {
     }
 
-    void updateX(int x) {
+    public void updateX(int x) {
     }
 
-    void updateY(int y) {
+    public void updateY(int y) {
     }
 
-    int getX() {
+    public int getX() {
         return 0;
     }
 
-    int getY() {
+    public int getY() {
         return 0;
     }
-    abstract void addWindowFlag(int flag);
-    abstract void removeWindowFlag(int flag);
 
+    public abstract void addWindowFlag(int flag);
+
+    public abstract void removeWindowFlag(int flag);
+
+    public abstract WindowManager.LayoutParams getLayoutParams();
+
+    public abstract void updateLayoutParams();
 }

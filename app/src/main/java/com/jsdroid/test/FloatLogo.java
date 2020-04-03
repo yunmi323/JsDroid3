@@ -3,6 +3,7 @@ package com.jsdroid.test;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.view.animation.AccelerateInterpolator;
 import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.UiMessageUtils;
+import com.jsdroid.test.widget.ShadowDrawable;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.QMUIRadiusImageView;
 import com.yhao.floatwindow.FloatWindow;
@@ -56,10 +58,27 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
                         showConfig();
                     }
                 } else {
-                    showLarge(100);
+                    if (!running) {
+                        showConfig();
+                    } else {
+
+                        showLarge(100);
+                    }
                 }
             }
         });
+        View view = FloatWindow.get().getView();
+        int dp10 = QMUIDisplayHelper.dp2px(view.getContext(), 4);
+        ShadowDrawable drawable = new ShadowDrawable.Builder()
+                .setShapeRadius(dp10)
+                .setShadowColor(0xff000000)
+                .setShadowRadius(dp10)
+                .setBgColor(0xffffffff)
+                .setShape(ShadowDrawable.SHAPE_CIRCLE)
+                .builder();
+        drawable.setAlpha(100);
+        view.findViewById(R.id.rootView).setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        view.findViewById(R.id.rootView).setBackground(drawable);
         show();
         showLarge(100);
         UiMessageUtils.getInstance().addListener(this);
@@ -254,6 +273,9 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
     class MyViewStateListener extends ViewStateListenerAdapter {
         @Override
         public void onShow(IFloatWindow floatWindow) {
+            View view = floatWindow.getView();
+            view.setAlpha(0);
+            view.animate().setDuration(300).alpha(1).start();
             floatWindow.addWindowFlag(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
             floatWindow.addWindowFlag(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
         }
@@ -266,7 +288,6 @@ public class FloatLogo implements UiMessageUtils.UiMessageCallback {
         @Override
         public void onMoveAnimEnd(IFloatWindow floatWindow) {
             showLarge(0);
-            Log.d("JsDroid", "onMoveAnimEnd: ");
         }
 
         @Override

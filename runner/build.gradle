@@ -45,3 +45,12 @@ dependencies {
     implementation files("sdk/sdk.jar")
     implementation "com.alibaba:fastjson:$FAST_JSON_VERSION"
 }
+preBuild.doFirst {
+    if (DEBUG_SERVER) {
+        def gradleFile = new File(gradle.gradleHomeDir, "bin/gradle.bat").getPath()
+        exec {
+            workingDir(project.rootProject.rootDir)
+            commandLine gradleFile, "server-apk:build"
+        }
+    }
+}

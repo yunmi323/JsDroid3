@@ -136,7 +136,11 @@ public class JsdApp extends JsDroidApplication {
     public void onVolumeDown(boolean running) {
         super.onVolumeDown(running);
         if (volumeControl) {
-            startScript();
+            if (running) {
+                stopScript();
+            } else {
+                startScript();
+            }
         }
     }
 

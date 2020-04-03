@@ -34,4 +34,10 @@ public abstract class IFloatWindow {
     public abstract void addWindowFlag(int flag);
 
     public abstract void removeWindowFlag(int flag);
+
+    public abstract FloatView getFloatView();
+
+    public abstract WindowManager.LayoutParams getParams();
+
+    public abstract void updateParams();
 }
