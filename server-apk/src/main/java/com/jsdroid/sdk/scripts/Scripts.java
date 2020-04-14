@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.jsdroid.api.IJsDroidApp;
 import com.jsdroid.api.JsDroidEnv;
+import com.jsdroid.commons.LibraryUtil;
 import com.jsdroid.groovy.AndroidGroovyScriptLoader;
 import com.jsdroid.script.JsDroidScript;
 import com.jsdroid.sdk.files.Files;
@@ -103,7 +104,7 @@ public class Scripts {
                 return script;
             }
         } catch (Throwable e) {
-            Log.e("JsDroid", "eval: ",e );
+            Log.e("JsDroid", "eval: ", e);
             return e;
         }
         return null;
@@ -162,7 +163,7 @@ public class Scripts {
 
     public Script createGroovyScriptFromJsd(String file) throws Exception {
         //如果脚本文件更新，则将里面的plugin解压出来
-        if (Files.isFileUpdate(new File(file))) {
+        if (Files.isPluginUpdate(new File(file))) {
             new ZipInput(file).unzipFileToDir("plugin", JsDroidEnv.pluginDir);
             File pluginDir = new File(JsDroidEnv.pluginDir, "plugin");
             File[] pluginFiles = pluginDir.listFiles();

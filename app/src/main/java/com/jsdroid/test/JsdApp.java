@@ -4,29 +4,23 @@ import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 
-import androidx.lifecycle.ProcessLifecycleOwnerInitializer;
-
-import com.blankj.utilcode.util.ActivityUtils;
-import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.FileUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.UiMessageUtils;
 import com.blankj.utilcode.util.ZipUtils;
-import com.jsdroid.runner.JsDroidAppImpl;
 import com.jsdroid.runner.JsDroidApplication;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class JsdApp extends JsDroidApplication {
     private String scriptFile;
     private boolean volumeControl;
     private boolean showFloatView;
-    ProcessLifecycleOwnerInitializer s;
 
     @Override
     public void onCreate() {
@@ -91,6 +85,9 @@ public class JsdApp extends JsDroidApplication {
     public void onJsDroidDisconnected() {
         super.onJsDroidDisconnected();
         UiMessageUtils.getInstance().send(UiMessage.JSDROID_DISCONNECT);
+        JsdLog.print("服务中断脚本停止");
+        UiMessageUtils.getInstance().send(UiMessage.PRINT, "服务中断脚本停止");
+        UiMessageUtils.getInstance().send(UiMessage.SRIPT_STOP, "服务中断脚本停止");
     }
 
     @Override

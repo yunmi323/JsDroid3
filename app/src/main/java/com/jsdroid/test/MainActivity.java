@@ -5,7 +5,6 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,9 +14,9 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.blankj.utilcode.util.UiMessageUtils;
+import com.jsdroid.runner.Config;
 import com.jsdroid.runner.JsDroidApplication;
 import com.jsdroid.test.widget.ScriptOptionView;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -40,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
     private AccountHeader accountHeader;
     private Drawer drawer;
     private ScriptOptionView optionView;
-    boolean pro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +90,17 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
                 jsdApp.switchVolumeControlState(isChecked);
             }
         }));
-        drawer.addItem(new PrimaryDrawerItem().withIdentifier(3).withName("重启服务")
+        if (Config.PRO) {
+            drawer.addItem(new SwitchDrawerItem().withIdentifier(3).withName("开机运行").withChecked(jsdApp.isRebootRun()).withSelectable(false).withOnCheckedChangeListener(new OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+                    JsdApp jsdApp = JsdApp.getInstance();
+                    jsdApp.setRebootRun(isChecked);
+                }
+            }));
+        }
+
+        drawer.addItem(new PrimaryDrawerItem().withIdentifier(4).withName("重启服务")
                 .withSelectable(false).withIsExpanded(true).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -102,8 +110,8 @@ public class MainActivity extends AppCompatActivity implements UiMessageUtils.Ui
                     }
                 }));
 
-        if (pro) {
-            drawer.addItem(new PrimaryDrawerItem().withIdentifier(4).withName("自定义su").withSelectable(false)
+        if (Config.PRO) {
+            drawer.addItem(new PrimaryDrawerItem().withIdentifier(5).withName("自定义su").withSelectable(false)
                     .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                         @Override
                         public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {

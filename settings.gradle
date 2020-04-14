@@ -5,3 +5,4 @@ rootProject.name = 'JsDroid3'
 
 //include ':api28'
 //project(':api28').projectDir=(new File("D:\\develop\\android\\android-api\\api28"))
+include ':colors'

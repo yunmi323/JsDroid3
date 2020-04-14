@@ -1,5 +1,6 @@
 package com.jsdroid.sdk.files;
 
+import com.jsdroid.api.JsDroidEnv;
 import com.jsdroid.codec.digest.DigestUtils;
 import com.jsdroid.script.JsDroidScript;
 
@@ -103,9 +104,12 @@ public class Files {
         return false;
     }
 
-    public static boolean isFileUpdate(File file) throws IOException {
+    public static boolean isPluginUpdate(File file) throws IOException {
         String md5 = md5(file);
-        File md5File = new File("/data/local/tmp/", file.getPath().replace("/", "_").replace("\\", "_") + ".md5");
+        if (!new File(JsDroidEnv.pluginDir).exists()) {
+            new File(JsDroidEnv.pluginDir).mkdirs();
+        }
+        File md5File = new File(JsDroidEnv.pluginDir, file.getPath().replace("/", "_").replace("\\", "_") + ".md5");
         if (md5File.exists()) {
             String old = FileUtils.readFileToString(md5File);
             if (old.equals(md5)) {

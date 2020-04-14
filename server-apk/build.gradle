@@ -30,12 +30,7 @@ android {
             abiFilters 'x86'
         }
     }
-    externalNativeBuild {
-        ndkBuild {
-            path 'jni/Android.mk'
-        }
 
-    }
 
     buildTypes {
         release {
@@ -56,6 +51,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
 }
 
 dependencies {
@@ -78,6 +74,9 @@ dependencies {
 
     implementation("eu.chainfire:libsuperuser:1.0.0.201811281328")
 //    implementation "commons-codec:commons-codec:1.14"
+
+    implementation 'androidx.core:core:1.2.0'
+    implementation 'androidx.sqlite:sqlite:2.1.0'
 
 }
 build.doLast {

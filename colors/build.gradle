@@ -1,0 +1,68 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+        //配置编译方式
+//        externalNativeBuild {
+//            ndkBuild {
+//                //一般真机cpu架构是arm
+//                abiFilters 'armeabi-v7a'
+//                //模拟器是x86
+//                abiFilters 'x86'
+//            }
+//        }
+        //配置 打包（决定包在什么平台可以运行）
+//        ndk {
+//            //一般真机cpu架构是arm
+//            abiFilters 'armeabi-v7a'
+//            //模拟器是x86
+//            abiFilters 'x86'
+//        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug{
+            debuggable false
+        }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/jni/Android.mk')
+        }
+    }
+    sourceSets {
+        main {
+            //so库路径
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}

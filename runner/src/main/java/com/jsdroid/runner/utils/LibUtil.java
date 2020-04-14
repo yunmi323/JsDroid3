@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -69,6 +71,7 @@ public class LibUtil {
                         continue;
                     }
                     Log.d("jsdroid", "extractLibFile abi:" + abi + " lib:" + libFile);
+                    new File(outDir, libFile).delete();
                     //解压so到outDir
                     try (FileOutputStream libOutput = new FileOutputStream(new File(outDir, libFile))) {
                         IOUtils.copy(zipInput, libOutput);
@@ -82,13 +85,14 @@ public class LibUtil {
         return libFiles;
     }
 
+    //只提供x86或者armv7支持
     public static List<String> getSupportABIs() {
-        List<String> ret = new ArrayList<>();
+
+        List<String> ret = new LinkedList<>();
         try {
             if (!ret.contains(Build.CPU_ABI)) {
                 if (Build.CPU_ABI != null)
                     ret.add(Build.CPU_ABI);
-                Log.d("JsDroid", "getSupportABIs: " + Build.CPU_ABI);
             }
         } catch (Throwable ignore) {
         }
@@ -100,7 +104,7 @@ public class LibUtil {
         } catch (Throwable ignore) {
         }
         try {
-            if (JsDroidAppEnv.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 for (String supportedAbi : Build.SUPPORTED_ABIS) {
                     if (supportedAbi != null) {
                         if (!ret.contains(supportedAbi)) {
@@ -112,6 +116,17 @@ public class LibUtil {
             }
         } catch (Throwable ignore) {
         }
+        Iterator<String> iterator = ret.iterator();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            if (next.trim().isEmpty()) {
+                iterator.remove();
+            }
+        }
+
+
         return ret;
     }
+    public static final int SDK_INT = Build.VERSION.SDK_INT
+            + ("REL".equals(Build.VERSION.CODENAME) ? 0 : 1);
 }

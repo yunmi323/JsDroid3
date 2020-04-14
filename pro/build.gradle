@@ -37,4 +37,9 @@ dependencies {
     implementation project(":runner")
     implementation project(":api")
     implementation project(":ipc")
+    implementation "org.apache.commons:commons-io:1.3.2"
+    implementation project(":app-hidden-api")
+    implementation "com.alibaba:fastjson:$FAST_JSON_VERSION"
+
+    implementation project(":colors")
 }

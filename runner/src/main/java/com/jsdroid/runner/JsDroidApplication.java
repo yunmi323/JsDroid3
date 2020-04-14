@@ -17,6 +17,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class JsDroidApplication<T> extends Application implements JsDroidDaemonThread.ShellCommandListener,
@@ -266,6 +268,7 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
             public void run() {
                 if (!connected) {
                     toast("服务未启动，请稍后重试！");
+                    onScriptPrint("服务未启动，请稍后重试！");
                     return;
                 }
                 IJsDroidShell jsDroidShell = getJsDroidShell();
@@ -345,5 +348,30 @@ public class JsDroidApplication<T> extends Application implements JsDroidDaemonT
 
     public String versionName() {
         return BuildConfig.VERSION_NAME;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void waitServerAndStartScript() {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (connected) {
+                    startScript();
+                    timer.cancel();
+                }
+            }
+        }, 1000, 1000);
+    }
+
+    public boolean isRebootRun() {
+        return Boolean.parseBoolean(readConfig("jsdroid.reboot.run", "false"));
+    }
+
+    public void setRebootRun(boolean run) {
+        saveConfig("jsdroid.reboot.run", Boolean.toString(run));
     }
 }

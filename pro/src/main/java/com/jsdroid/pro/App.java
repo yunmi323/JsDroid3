@@ -30,10 +30,6 @@ public class App extends JsDroidApplication {
     @Override
     public void onJsDroidConnected() {
         super.onJsDroidConnected();
-        try {
-            IJsDroidShell jsDroidShell = getJsDroidShell();
-            jsDroidShell.runCode("print 1");
-        } catch (Exception e) {
-        }
+
     }
 }
