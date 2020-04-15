@@ -162,9 +162,10 @@ public class Scripts {
     }
 
     public Script createGroovyScriptFromJsd(String file) throws Exception {
-        //如果脚本文件更新，则将里面的plugin解压出来
+        //如果脚本文件更新，则将里面的plugin解压出来并且解压出so文件
         if (Files.isPluginUpdate(new File(file))) {
             new ZipInput(file).unzipFileToDir("plugin", JsDroidEnv.pluginDir);
+            //解压插件的so文件
             File pluginDir = new File(JsDroidEnv.pluginDir, "plugin");
             File[] pluginFiles = pluginDir.listFiles();
             if (pluginFiles != null) {
@@ -175,12 +176,22 @@ public class Scripts {
                                 Libs.extractLibFile(pluginFile.getPath(), JsDroidEnv.libDir);
                             } catch (Exception e) {
                             }
-                            try {
-                                PluginClassLoader.getInstance().add(pluginFile.getPath());
-                            } catch (IOException e) {
-                            }
                         }
-
+                    }
+                }
+            }
+        }
+        //加载插件
+        File pluginDir = new File(JsDroidEnv.pluginDir, "plugin");
+        File[] pluginFiles = pluginDir.listFiles();
+        if (pluginFiles != null) {
+            for (File pluginFile : pluginFiles) {
+                if (pluginFile.isFile()) {
+                    if (pluginFile.getName().endsWith(".apk")) {
+                        try {
+                            PluginClassLoader.getInstance().add(pluginFile.getPath());
+                        } catch (Exception e) {
+                        }
                     }
                 }
             }

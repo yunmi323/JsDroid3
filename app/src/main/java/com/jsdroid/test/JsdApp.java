@@ -85,9 +85,9 @@ public class JsdApp extends JsDroidApplication {
     public void onJsDroidDisconnected() {
         super.onJsDroidDisconnected();
         UiMessageUtils.getInstance().send(UiMessage.JSDROID_DISCONNECT);
-        JsdLog.print("服务中断脚本停止");
-        UiMessageUtils.getInstance().send(UiMessage.PRINT, "服务中断脚本停止");
-        UiMessageUtils.getInstance().send(UiMessage.SRIPT_STOP, "服务中断脚本停止");
+        JsdLog.print("脚本服务中断");
+        UiMessageUtils.getInstance().send(UiMessage.PRINT, "脚本服务中断");
+        UiMessageUtils.getInstance().send(UiMessage.SRIPT_STOP, "脚本服务中断");
     }
 
     @Override
